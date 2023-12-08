@@ -1,5 +1,7 @@
 <h1 align="center">Reservation commands</h1>
 
+## Reserve resources
+
 ### `srun` command
 - to obtain a terminal on a CPU compute node within which you can execute your code,
 - or to directly execute your code on the CPU partition.
@@ -88,13 +90,17 @@ Submitted batch job 5858478
 ```
 - Display jobs
 ```shell
-squeue -u $USER
+squeue -j 5858478
 ```
-*** This command can display nothing if the job is very fast, but you can check the output of the job running
+***This command can display nothing if the job is very fast, but you can check the output of the job running***
 ```shell
 cat slurm-5858478.out
 ```
 ***The file slurm-jobid.out is generated automatically***
+
+## Check the available resources using `sinfo` and `scontrol` commands
+
+
 
 
 #### Slurm Parameters: nodes, tasks, cpus
@@ -110,7 +116,7 @@ cat slurm-5858478.out
 ```shell
 srun --nodes=2 --pty bash
 ```
-***Oups!!! It does not work
+***Oups!!! It does not work***
 ```shell
 srun: error: Unable to allocate resources: Node count specification invalid
 ```
@@ -123,7 +129,7 @@ srun: error: Unable to allocate resources: Node count specification invalid
 - `longq`: partition used for long jobs (max 30 days), with only one node per job (44 cores max.).
 - `special`: used for running parallel jobs (max 30 minutes).
 - `visu`: partition used for visualization.
-- `gpu`: partition used for gpu computations (all nodes in this partition have gpu card P100 or P40), with max of two nodes per job (88 cores max.)
+- `gpu`: partition used for gpu computations (all nodes in this partition have gpu card P100 or P40), with max of two nodes per job (88 cores max.).
 
 | Partition | Max. Cpu Time | Nodes available for the partition | Max nodes per job | Min-Max cores per job     |
 |-----------|---------------|-------------------------------------------------------|-------------------|---------------------------|
@@ -134,24 +140,101 @@ srun: error: Unable to allocate resources: Node count specification invalid
 | visu      | 24 hours      |              1  (visu01)                                |             1       |     1-44          |
 | gpu       | 48 hours      |              12 (node[06-17])                           |             2       |     1-88          |
 
-### Examples:
-- You can reserve a job using `gpu` partition with max of two nodes (88 cores)
-- You can reserve a job using `special` partition with max of 15 nodes (652 cores)
-- ...
-
-
+```shell
+srun --partition=shortq --nodes=2 --pty bash
+```
+- Display jobs information
+```shell
+JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           5858482    shortq     bash ikissami  R       0:06      2 node[03-04]
+```
+- This command will reserve 2 nodes, with 1 cpu in each node and 2*8.7GB. To check this, run this command:
+```shell
+scontrol show jobid 5858482
+```
+- Output:
+```shell
+JobId=5858482 JobName=bash
+   UserId=ikissami(1063) GroupId=ikissami(1074) MCS_label=N/A
+   Priority=105683 Nice=0 Account=novec-account QOS=normal
+   JobState=RUNNING Reason=None Dependency=(null)
+   Requeue=1 Restarts=0 BatchFlag=0 Reboot=0 ExitCode=0:0
+   RunTime=00:00:12 TimeLimit=04:00:00 TimeMin=N/A
+   SubmitTime=2023-12-08T22:18:20 EligibleTime=2023-12-08T22:18:20
+   StartTime=2023-12-08T22:18:20 EndTime=2023-12-09T02:18:21 Deadline=N/A
+   PreemptTime=None SuspendTime=None SecsPreSuspend=0
+   LastSchedEval=2023-12-08T22:18:20
+   Partition=shortq AllocNode:Sid=master01:192503
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=node[03-04]
+   BatchHost=node03
+   NumNodes=2 NumCPUs=2 NumTasks=2 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   TRES=cpu=2,mem=17514M,node=2,billing=2
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   MinCPUsNode=1 MinMemoryCPU=8757M MinTmpDiskNode=0
+   Features=(null) DelayBoot=00:00:00
+   Gres=(null) Reservation=(null)
+   OverSubscribe=OK Contiguous=0 Licenses=(null) Network=(null)
+   Command=bash
+   WorkDir=/home/ikissami/TRAINING
+   Power=
+```  
+    - You can reserve a job using `gpu` partition with max of two nodes (88 cores)
+    - You can reserve a job using `special` partition with max of 15 nodes (652 cores)
+    
 - **--ntasks**
   - *a task can be considered a command such as blastn, bwa, script.py, etc.*
     - `--ntasks=1` \# total tasks across all nodes per job
     - *when using `--ntasks` without `--nodes`, the values for `--ntasks-per-node` and `--cpus-per-task` will default to 1 node, 1 task per node, and 1 cpu per task*
 
-- **--ntasks-per-node**
-  - *use together with `--cpus-per-task`*
-    - `--ntasks-per-node=1`
+- Create file `mpiscript.py`
+```python
+from mpi4py import MPI
+COMM = MPI.COMM_WORLD
+SIZE = COMM.Get_size()
+RANK = COMM.Get_rank()
 
-- **--cpus-per-task**
-  - *number of CPUs (cores) for each task (command)*
-    - `--cpus-per-task=44`
+if RANK==0: print("the number of cpus is:", SIZE)
+```
+- Run the script using 44 cores in one node (load python/3.8.2-GCCcore-9.3.0 and OpenMPI/4.0.3-GCC-9.3.0)
+```shell
+srun --partition=shortq --nodes=1 --ntasks=44 --pty bash
+```
+- Then run
+```shell
+ mpirun python3 mpiscript.py
+```
+- Display job information after getting the jobid using `ssqueue` or `squeue -u $USER`
+```shell
+JobId=5858486 JobName=bash
+   UserId=ikissami(1063) GroupId=ikissami(1074) MCS_label=N/A
+   Priority=105584 Nice=0 Account=novec-account QOS=normal
+   JobState=RUNNING Reason=None Dependency=(null)
+   Requeue=1 Restarts=0 BatchFlag=0 Reboot=0 ExitCode=0:0
+   RunTime=00:00:11 TimeLimit=04:00:00 TimeMin=N/A
+   SubmitTime=2023-12-08T22:20:58 EligibleTime=2023-12-08T22:20:58
+   StartTime=2023-12-08T22:20:58 EndTime=2023-12-09T02:20:58 Deadline=N/A
+   PreemptTime=None SuspendTime=None SecsPreSuspend=0
+   LastSchedEval=2023-12-08T22:20:58
+   Partition=shortq AllocNode:Sid=master01:192503
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=node05
+   BatchHost=node05
+   NumNodes=1 NumCPUs=44 NumTasks=44 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   TRES=cpu=44,mem=385308M,node=1,billing=44
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   MinCPUsNode=1 MinMemoryCPU=8757M MinTmpDiskNode=0
+   Features=(null) DelayBoot=00:00:00
+   Gres=(null) Reservation=(null)
+   OverSubscribe=OK Contiguous=0 Licenses=(null) Network=(null)
+   Command=bash
+   WorkDir=/home/ikissami/TRAINING
+   Power=
+```
+or run this command if your application uses distributed computing (this command can reserve more than one node if it's needed
+```shell
+srun --partition=shortq --ntasks=44 --pty bash
+```
 
 #### Additional Slurm Parameters
 
@@ -177,41 +260,60 @@ srun: error: Unable to allocate resources: Node count specification invalid
     - `--error=stderr.%x.%j` *# saves stderr to a file named stderr.jobname.JobID*
     - *use just `--output` to save stdout and stderr to the same output file:* `--output=output.%j.log`
 
-
-
-
-- Display job information
+#### Multi nodes & cores reservation
 ```shell
-scontrol show job 5858476
+#!/bin/bash                                                                                                                                                                                                 
+
+#SBATCH --partition=gpu           # longq partition                                                                                                                                                         
+#SBATCH --job-name=mpijob         # keep job name short with no spaces                                                                                                                                      
+#SBATCH --time=1-00:00:00         # request 1 day; Format: days-hours:minutes:seconds                                                                                                                       
+#SBATCH --nodes=2                 # request 1 node (optional since default=1)                                                                                                                               
+#SBATCH --ntasks-per-node=2       # request 1 task (command) per node                                                                                                                                       
+#SBATCH --mem=7500M               # request 7.5GB total memory per node;                                                                                                                                    
+#SBATCH --output=stdout.%x.%j     # save stdout to a file with job name and JobID appended to file name                                                                                                     
+#SBATCH --error=stderr.%x.%j      # save stderr to a file with job name and JobID appended to file name                                                                                                     
+
+# unload any modules to start with a clean environment                                                                                                                                                      
+module purge
+# load software modules                                                                                                                                                                                     
+module load slurm Python/3.8.2-GCCcore-9.3.0 OpenMPI/4.0.3-GCC-9.3.0
+
+mpirun python3 mpiscript.py
 ```
-- Output:
+- Output: (display the content of stdout.jobname.jobid) 
 ```shell
-JobId=5858476 JobName=bash
-   UserId=ikissami(1063) GroupId=ikissami(1074) MCS_label=N/A
-   Priority=102842 Nice=0 Account=novec-account QOS=normal
-   JobState=RUNNING Reason=None Dependency=(null)
-   Requeue=1 Restarts=0 BatchFlag=0 Reboot=0 ExitCode=0:0
-   RunTime=00:02:10 TimeLimit=01:00:00 TimeMin=N/A
-   SubmitTime=2023-12-08T21:44:05 EligibleTime=2023-12-08T21:44:05
-   StartTime=2023-12-08T21:44:05 EndTime=2023-12-08T22:44:05 Deadline=N/A
-   PreemptTime=None SuspendTime=None SecsPreSuspend=0
-   LastSchedEval=2023-12-08T21:44:05
-   Partition=defq AllocNode:Sid=master01:192503
-   ReqNodeList=(null) ExcNodeList=(null)
-   NodeList=node03
-   BatchHost=node03
-   NumNodes=1 NumCPUs=1 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
-   TRES=cpu=1,mem=8757M,node=1,billing=1
-   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
-   MinCPUsNode=1 MinMemoryCPU=8757M MinTmpDiskNode=0
-   Features=(null) DelayBoot=00:00:00
-   Gres=(null) Reservation=(null)
-   OverSubscribe=OK Contiguous=0 Licenses=(null) Network=(null)
-   Command=(null)
-   WorkDir=/home/ikissami
-   Power=
+cat stdout.mpijob.5858504 
+```
+```shell
+the number of cpus is: 4
 ```
 
+#### Multi nodes & GPU reservation
+
+```shell
+#!/bin/bash                                                                                                                                                                                                 
+
+#SBATCH --partition=gpu           # longq partition                                                                                                                                    
+#SBATCH --job-name=gpujob         # keep job name short with no spaces                                                                                                                                      
+#SBATCH --time=1-00:00:00         # request 1 day; Format: days-hours:minutes:seconds                                                                                                                       
+#SBATCH --nodes=2                 # request 1 node (optional since default=1)
+#SBATCH --gres=gpu:1              # request 1 GPU;                                                                                                                         
+#SBATCH --ntasks-per-node=2       # request 1 task (command) per node                                                                                                                                       
+#SBATCH --mem=7500M               # request 7.5GB total memory per node;                                                                                                                                    
+#SBATCH --output=stdout.%x.%j     # save stdout to a file with job name and JobID appended to file name                                                                                                     
+#SBATCH --error=stderr.%x.%j      # save stderr to a file with job name and JobID appended to file name                                                                                                     
+
+# unload any modules to start with a clean environment                                                                                                                                                      
+module purge
+# load software modules                                                                                                                                                                                     
+module load slurm Python/3.8.2-GCCcore-9.3.0 OpenMPI/4.0.3-GCC-9.3.0
 
 
-
+```
+- Output: (display the content of stdout.jobname.jobid) 
+```shell
+cat stdout.mpijob.5858504 
+```
+```shell
+the number of cpus is: 4
+```
