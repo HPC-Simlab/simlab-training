@@ -98,10 +98,92 @@ cat slurm-5858478.out
 ```
 ***The file slurm-jobid.out is generated automatically***
 
-## Check the available resources using `sinfo` and `scontrol` commands
+## Check the available resources using `sinfo` and `squeue` commands
 
+- `sinfo` command
+```shell
+sinfo
+```
+- Output
+```shell
+PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+defq*        up    1:00:00      2   resv node[01-02]
+defq*        up    1:00:00      3    mix node[03-04,14]
+defq*        up    1:00:00      1  alloc node15
+defq*        up    1:00:00      1   idle node05
+gpu          up 2-00:00:00      2    mix node[06,14]
+gpu          up 2-00:00:00      9  alloc node[07-10,12-13,15-17]
+gpu          up 2-00:00:00      1   idle node11
+shortq       up    4:00:00      2   resv node[01-02]
+shortq       up    4:00:00      3    mix node[03-04,14]
+shortq       up    4:00:00      1  alloc node15
+shortq       up    4:00:00      1   idle node05
+longq        up 30-00:00:0      2   resv node[01-02]
+longq        up 30-00:00:0      3    mix node[03-04,14]
+longq        up 30-00:00:0      1  alloc node15
+longq        up 30-00:00:0      1   idle node05
+visu         up 1-00:00:00      1    mix visu01
+special      up      30:00      2   resv node[01-02]
+special      up      30:00      4    mix node[03-04,06,14]
+special      up      30:00      9  alloc node[07-10,12-13,15-17]
+special      up      30:00      2   idle node[05,11]
+```
 
-
+- Display the state for each node
+```shell
+sinfo -o "%n %G %C %t"
+```
+- Output
+```shell
+HOSTNAMES GRES CPUS(A/I/O/T) STATE
+node01 (null) 0/40/0/40 resv
+node02 (null) 0/40/0/40 resv
+node03 (null) 30/14/0/44 mix
+node04 (null) 30/14/0/44 mix
+node14 gpu:1 43/1/0/44 mix
+node15 gpu:1 44/0/0/44 alloc
+node05 (null) 0/44/0/44 idle
+node06 gpu:1 6/38/0/44 mix
+node07 gpu:1 44/0/0/44 alloc
+node08 gpu:1 44/0/0/44 alloc
+node12 gpu:1 44/0/0/44 alloc
+node13 gpu:1 44/0/0/44 alloc
+node16 gpu:1 44/0/0/44 alloc
+node09 gpu:1 0/44/0/44 idle
+node10 gpu:1 0/44/0/44 idle
+node11 gpu:1 0/44/0/44 idle
+node17 gpu:1 0/44/0/44 idle
+visu01 gpu:1 1/43/0/44 mix
+```
+- Display the nodes for each state
+```shell
+sinfo -o "%N %t %C"
+```
+- Output
+```shell
+NODELIST STATE CPUS(A/I/O/T)
+node[01-02] resv 0/80/0/80
+node[03-04,06,14],visu01 mix 110/110/0/220
+node[07-08,12-13,15-16] alloc 264/0/0/264
+node[05,09-11,17] idle 0/220/0/220
+```
+- Display the available gpus
+```shell
+squeue -t RUNNING --partition=gpu -o '%b %N'
+```
+- Output
+```shell
+GRES NODELIST
+GRES NODELIST
+(null) node14
+(null) node06
+(null) node13
+(null) node16
+gpu:1 node08
+gpu:1 node07
+gpu:1 node12
+gpu:1 node06
+```
 
 #### Slurm Parameters: nodes, tasks, cpus
 
