@@ -51,39 +51,16 @@ salloc: Granted job allocation 5858476
 ```
 - Display the submitted jobs
 ```shell
-JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
-           5858476      defq     bash ikissami  R       0:35      1 node03
+squeue -u $USER
 ```
-- Display job information
+or 
 ```shell
-scontrol show job 5858476
+ssqueue
 ```
 - Output:
 ```shell
-JobId=5858476 JobName=bash
-   UserId=ikissami(1063) GroupId=ikissami(1074) MCS_label=N/A
-   Priority=102842 Nice=0 Account=novec-account QOS=normal
-   JobState=RUNNING Reason=None Dependency=(null)
-   Requeue=1 Restarts=0 BatchFlag=0 Reboot=0 ExitCode=0:0
-   RunTime=00:02:10 TimeLimit=01:00:00 TimeMin=N/A
-   SubmitTime=2023-12-08T21:44:05 EligibleTime=2023-12-08T21:44:05
-   StartTime=2023-12-08T21:44:05 EndTime=2023-12-08T22:44:05 Deadline=N/A
-   PreemptTime=None SuspendTime=None SecsPreSuspend=0
-   LastSchedEval=2023-12-08T21:44:05
-   Partition=defq AllocNode:Sid=master01:192503
-   ReqNodeList=(null) ExcNodeList=(null)
-   NodeList=node03
-   BatchHost=node03
-   NumNodes=1 NumCPUs=1 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
-   TRES=cpu=1,mem=8757M,node=1,billing=1
-   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
-   MinCPUsNode=1 MinMemoryCPU=8757M MinTmpDiskNode=0
-   Features=(null) DelayBoot=00:00:00
-   Gres=(null) Reservation=(null)
-   OverSubscribe=OK Contiguous=0 Licenses=(null) Network=(null)
-   Command=(null)
-   WorkDir=/home/ikissami
-   Power=
+JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           5858476      defq     bash ikissami  R       0:35      1 node03
 ```
 
 ### `sbatch` command
@@ -102,6 +79,22 @@ module load Python/3.8.2-GCCcore-9.3.0
 # run commands
 python3 script.py
 ```
+- Run the job file
+```sbatch job.slurm
+```
+- Output:
+```shell
+Submitted batch job 5858478
+```
+- Display jobs
+```shell
+squeue -u $USER
+```
+*** This command can display nothing if the job is very fast, but you can check the output of the job running
+```shell
+cat slurm-5858478.out
+```
+***The file slurm-jobid.out is generated automatically***
 
 
 #### Slurm Parameters: nodes, tasks, cpus
@@ -110,7 +103,7 @@ python3 script.py
   - *number of nodes to use where a node is one computer unit of many in an HPC cluster (optional)*
     - `--nodes=1` \# request 1 node (optional since default=1)
     - *used for multi-node jobs*
-      - `--nodes=10`
+      - `--nodes=2`
     - *if the number of cpus per node is not specified then defaults to 1 cpu*
     - *defaults=1 node if `--nodes` not used & can use with `--ntasks-per-node` and `--cpus-per-task`
     - *do not use `--nodes` with `--array*
@@ -153,8 +146,40 @@ python3 script.py
     - *use just `--output` to save stdout and stderr to the same output file:* `--output=output.%j.log`
 
 - **--partition**
-  - *specify a partition (queue) to use (optional, use as needed)*
-    - *partition is automatically assigned to short, medium, long. Also, automatic for gpu (when using `--gres=gpu`)*
+  - *specify a partition (queue)*
+
+
+- Display job information
+```shell
+scontrol show job 5858476
+```
+- Output:
+```shell
+JobId=5858476 JobName=bash
+   UserId=ikissami(1063) GroupId=ikissami(1074) MCS_label=N/A
+   Priority=102842 Nice=0 Account=novec-account QOS=normal
+   JobState=RUNNING Reason=None Dependency=(null)
+   Requeue=1 Restarts=0 BatchFlag=0 Reboot=0 ExitCode=0:0
+   RunTime=00:02:10 TimeLimit=01:00:00 TimeMin=N/A
+   SubmitTime=2023-12-08T21:44:05 EligibleTime=2023-12-08T21:44:05
+   StartTime=2023-12-08T21:44:05 EndTime=2023-12-08T22:44:05 Deadline=N/A
+   PreemptTime=None SuspendTime=None SecsPreSuspend=0
+   LastSchedEval=2023-12-08T21:44:05
+   Partition=defq AllocNode:Sid=master01:192503
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=node03
+   BatchHost=node03
+   NumNodes=1 NumCPUs=1 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   TRES=cpu=1,mem=8757M,node=1,billing=1
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   MinCPUsNode=1 MinMemoryCPU=8757M MinTmpDiskNode=0
+   Features=(null) DelayBoot=00:00:00
+   Gres=(null) Reservation=(null)
+   OverSubscribe=OK Contiguous=0 Licenses=(null) Network=(null)
+   Command=(null)
+   WorkDir=/home/ikissami
+   Power=
+```
 
 
 
