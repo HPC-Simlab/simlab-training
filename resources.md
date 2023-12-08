@@ -106,7 +106,39 @@ cat slurm-5858478.out
       - `--nodes=2`
     - *if the number of cpus per node is not specified then defaults to 1 cpu*
     - *defaults=1 node if `--nodes` not used & can use with `--ntasks-per-node` and `--cpus-per-task`
-    - *do not use `--nodes` with `--array*
+
+```shell
+srun --nodes=2 --pty bash
+```
+***Oups!!! It does not work
+```shell
+srun: error: Unable to allocate resources: Node count specification invalid
+```
+***The number of nodes that could be allocated in the `defq` partition is limited to 1.
+
+- **--partition**
+  - *specify a partition (queue)*
+- `defq`: partition is automatically used if no partition is specified by all jobs. The execution time by default is 4 hours.
+- `shortq`: partition used for short jobs (max. 12 hours), with max of two nodes per job (88 cores max.)
+- `longq`: partition used for long jobs (max 30 days), with only one node per job (44 cores max.).
+- `special`: used for running parallel jobs (max 30 minutes).
+- `visu`: partition used for visualization.
+- `gpu`: partition used for gpu computations (all nodes in this partition have gpu card P100 or P40), with max of two nodes per job (88 cores max.)
+
+| Partition | Max. Cpu Time | Nodes available for the partition | Max nodes per job | Min-Max cores per job     |
+|-----------|---------------|-------------------------------------------------------|-------------------|---------------------------|
+| defq      | 4 hours       |              5 (node01, node02 node03, node14, node15)  |             1       |     1-44          |
+| shortq    | 12 hours      |              5 (node01, node02 node03, node14, node15)  |             2       |     1-88          |
+| longq     | 30 days       |              5 (node01, node02 node03, node14, node15)  |             1       |     1-44          |
+| special   | 30 minutes    |              15 (all nodes)                             |            15       |     1-652         |
+| visu      | 24 hours      |              1  (visu01)                                |             1       |     1-44          |
+| gpu       | 48 hours      |              12 (node[06-17])                           |             2       |     1-88          |
+
+### Examples:
+- You can reserve a job using `gpu` partition with max of two nodes (88 cores)
+- You can reserve a job using `special` partition with max of 15 nodes (652 cores)
+- ...
+
 
 - **--ntasks**
   - *a task can be considered a command such as blastn, bwa, script.py, etc.*
@@ -145,8 +177,7 @@ cat slurm-5858478.out
     - `--error=stderr.%x.%j` *# saves stderr to a file named stderr.jobname.JobID*
     - *use just `--output` to save stdout and stderr to the same output file:* `--output=output.%j.log`
 
-- **--partition**
-  - *specify a partition (queue)*
+
 
 
 - Display job information
