@@ -59,12 +59,16 @@ or
 ```shell
 ssqueue
 ```
-- Output:
+- Output in Simlab:
 ```shell
 JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
            5858476      defq     bash ikissami  R       0:35      1 node03
 ```
-
+- Output in Toubkal:
+```shell
+JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           2094639   compute     bash imad.kis  R       0:04      1 slurm-compute-h21a5-u14-svn1
+```
 ### `sbatch` command
 
 - Create file `job.slurm`
@@ -104,7 +108,7 @@ cat slurm-5858478.out
 ```shell
 sinfo
 ```
-- Output
+- Output in Simlab
 ```shell
 PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
 defq*        up    1:00:00      2   resv node[01-02]
@@ -128,12 +132,24 @@ special      up      30:00      4    mix node[03-04,06,14]
 special      up      30:00      9  alloc node[07-10,12-13,15-17]
 special      up      30:00      2   idle node[05,11]
 ```
-
-- Display the state for each node
+- Output in Toubkal
+```shell
+PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+compute*     up   infinite    653  down$ slurm-compute-h21a5-u23-svn[2,4],slurm-compute-h21a5-u24-svn[1,3],slurm-compute-h21a5-u25-svn[2,4],slurm-compute-h21a5-u26-svn[1,3],slurm-compute-h21a5-u27-svn[2,4],slurm-compute-h21a5-u28-svn[1,3],slurm-compute-h21a5-u29-svn[2,4],slurm-compute-h21a5-u30-svn[1,3],slurm-compute-h21a5-u31-svn[2,4],slurm-compute-h21a5-u32-svn[1,3],slurm-compute-h21a5-u33-svn[2,4],slurm-compute-h21a5-u34-svn[1,3],slurm-compute-h21a5-u35-svn[2,4],slurm-compute-h21a5-u36-svn[1,3],slurm-compute-h21a8-u1-svn[2,4],slurm-compute-h21a8-u2-svn[1,3],slurm-compute-h21a8-u23-svn[2,4],
+[...]
+himem        up   infinite      1  maint slurm-himem-h22a8-u5-sv
+himem        up   infinite      1    mix slurm-himem-h22a8-u9-sv
+himem        up   infinite      2  alloc slurm-himem-h22a8-u1-sv,slurm-himem-h22a8-u3-sv
+himem        up   infinite      1   idle slurm-himem-h22a8-u7-sv
+gpu          up   infinite      1  maint slurm-a100-gpu-h22a2-u14-sv
+gpu          up   infinite      2    mix slurm-a100-gpu-h22a2-u10-sv,slurm-a100-gpu-h22a2-u18-sv
+gpu          up   infinite      2   idle slurm-a100-gpu-h22a2-u22-sv,slurm-a100-gpu-h22a2-u26-sv
+```
+- Display the state for each node 
 ```shell
 sinfo -o "%n %G %C %t"
 ```
-- Output
+- Output in Simlab
 ```shell
 HOSTNAMES GRES CPUS(A/I/O/T) STATE
 node01 (null) 0/40/0/40 resv
@@ -159,7 +175,7 @@ visu01 gpu:1 1/43/0/44 mix
 ```shell
 sinfo -o "%N %t %C"
 ```
-- Output
+- Output in Simlab
 ```shell
 NODELIST STATE CPUS(A/I/O/T)
 node[01-02] resv 0/80/0/80
@@ -169,22 +185,29 @@ node[05,09-11,17] idle 0/220/0/220
 ```
 - Display the available gpus
 ```shell
-squeue -t RUNNING --partition=gpu -o '%b %N'
+squeue --partition=gpu -o '%b %N %C' 
 ```
-- Output
+- Output in Simlab
 ```shell
-GRES NODELIST
-GRES NODELIST
-(null) node14
-(null) node06
-(null) node13
-(null) node16
-gpu:1 node08
-gpu:1 node07
-gpu:1 node12
-gpu:1 node06
+GRES NODELIST CPUS
+(null) node14 5  # means that the GPU is not used, and 5 CPUs are used over 44. You can allocate the GPU in this node with max of 39 CPUs.
+(null) node06 5  # means that the GPU is not used, and 5 CPUs are used over 44. You can allocate the GPU in this node with max of 39 CPUs.
+(null) node13 44 # means that the GPU is not used, but 44 CPUs are used. This node cannot be allocated (no free CPU).
+(null) node16 44 # means that the GPU is not used, but 44 CPUs are used. This node cannot be allocated (no free CPU).
+gpu:1 node08 44  # means that the GPU is used, and 44 CPUs are used. This node cannot be allocated (GPU unavailable and no free CPUs).
+gpu:1 node07 44  # means that the GPU is used, and 44 CPUs are used. This node cannot be allocated (GPU unavailable and no free CPUs).
+gpu:1 node12 44  # means that the GPU is used, and 44 CPUs are used. This node cannot be allocated (GPU unavailable and no free CPUs).
+gpu:1 node06 1   # means that the GPU is used, and 1 CPU is used. The GPU in this node cannot be reserved (43 free CPUs).
 ```
-
+- Output in Toubkal
+```shell
+TRES_PER_NODE NODELIST CPUS
+gres:gpu:1 slurm-a100-gpu-h22a2-u10-sv 1
+gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1
+gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1
+gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1
+gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1
+```
 #### Slurm Parameters: nodes, tasks, cpus
 
 - **--nodes**
