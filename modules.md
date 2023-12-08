@@ -67,7 +67,7 @@ CFGS1=/cm/shared/apps/easybuild/4.4.2/lib/python3.5/site-packages/easybuild_easy
 * $CFGS1/g/gmsh/gmsh-4.2.2-foss-2018b-Python-3.6.6.eb
 [...]
 ```
-#### Installation option:
+#### Installation option
 
 - --robot: to enable dependency resolution.
 - --detect-loaded-modules=error: to print a clear error and stop when any (non-allowed) loaded modules are detected.
@@ -82,4 +82,21 @@ mkdir EASYBUILD
 ```shell
  eb --modules-tool EnvironmentModules --module-syntax Tcl --prefix=$HOME/EASYBUILD --robot --detect-loaded-modules=error --detect-loaded-modules=purge --optarch=GENERIC gmsh-4.7.1-foss-2020a-Python-3.8.2.eb
 ```
+- This command will install gmsh with all the dependencies
+  
+#### Add the installed packages to the available modules
+```shell
+module use $HOME/EASYBUILD/modules/all
+```
+#### List new avail modules
+```shell
+module use $HOME/EASYBUILD/modules/all
+```
+- Output:
+```shell
+----------------------------------------------------------------------------------- /home/<login>/EASYBUILD/modules/all -----------------------------------------------------------------------------------
+gmsh/4.7.1-foss-2020a-Python-3.8.2  SLEPc/3.12.2-foss-2020a-Python-3.8.2  SWIG/4.0.1-GCCcore-9.3.0  
+```
+- Now you can load the modules
+
 
