@@ -183,15 +183,18 @@ node[03-04,06,14],visu01 mix 110/110/0/220
 node[07-08,12-13,15-16] alloc 264/0/0/264
 node[05,09-11,17] idle 0/220/0/220
 ```
-- Display the available gpus
+- Display the available GPUs for the running jobs
+    - In simlab there is only one GPU per node
+    - In Toubkal there are 4 GPUs per node
+
 ```shell
-squeue --partition=gpu -o '%b %N %C' 
+squeue -t RUNNING --partition=gpu -o '%b %N %C'
 ```
 - Output in Simlab
 ```shell
 GRES NODELIST CPUS
-(null) node14 5  # means that the GPU is not used, and 5 CPUs are used over 44. You can allocate the GPU in this node with max of 39 CPUs.
-(null) node06 5  # means that the GPU is not used, and 5 CPUs are used over 44. You can allocate the GPU in this node with max of 39 CPUs.
+(null) node14 5  # means that the GPU is not used, and 5 CPUs are used over 44. You can allocate the GPU in this node with a max of 39 CPUs.
+(null) node06 5  # means that the GPU is not used, and 5 CPUs are used over 44. You can allocate the GPU in this node with a max of 39 CPUs.
 (null) node13 44 # means that the GPU is not used, but 44 CPUs are used. This node cannot be allocated (no free CPU).
 (null) node16 44 # means that the GPU is not used, but 44 CPUs are used. This node cannot be allocated (no free CPU).
 gpu:1 node08 44  # means that the GPU is used, and 44 CPUs are used. This node cannot be allocated (GPU unavailable and no free CPUs).
@@ -199,15 +202,18 @@ gpu:1 node07 44  # means that the GPU is used, and 44 CPUs are used. This node c
 gpu:1 node12 44  # means that the GPU is used, and 44 CPUs are used. This node cannot be allocated (GPU unavailable and no free CPUs).
 gpu:1 node06 1   # means that the GPU is used, and 1 CPU is used. The GPU in this node cannot be reserved (43 free CPUs).
 ```
+***this means that node09, node10 and node11 are available to be allocated***
+
 - Output in Toubkal
 ```shell
 TRES_PER_NODE NODELIST CPUS
-gres:gpu:1 slurm-a100-gpu-h22a2-u10-sv 1
-gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1
-gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1
-gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1
-gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1
+gres:gpu:1 slurm-a100-gpu-h22a2-u10-sv 1 # means that the GPU is used, and 1 CPU is used. This node can be allocated (3 GPUs available and 55 free CPUs).
+gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1 # means that the GPU is used, and 1 CPU is used. This node can be allocated (3 GPUs available and 55 free CPUs).
+gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1 # means that the GPU is used, and 1 CPU is used. This node can be allocated (3 GPUs available and 55 free CPUs).
+gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1 # means that the GPU is used, and 1 CPU is used. This node can be allocated (3 GPUs available and 55 free CPUs).
+gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1 # means that the GPU is used, and 1 CPU is used. This node can be allocated (3 GPUs available and 55 free CPUs).
 ```
+
 #### Slurm Parameters: nodes, tasks, cpus
 
 - **--nodes**
