@@ -88,6 +88,22 @@ JobId=5858476 JobName=bash
 
 ### `sbatch` command
 
+- Create file `job.slurm`
+
+```shell
+#!/bin/bash
+
+#SBATCH --ntasks=1
+
+# unload any modules to start with a clean environment
+module purge
+# load software modules
+module load Python/3.8.2-GCCcore-9.3.0
+# run commands
+python3 script.py
+```
+
+
 #### Slurm Parameters: nodes, tasks, cpus
 
 - **--nodes**
