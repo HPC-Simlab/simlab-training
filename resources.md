@@ -1,24 +1,23 @@
+
 <h1 align="center">Reservation commands</h1>
 
-## Reserve resources
+## I. Reserve resources
 
-### `srun` command
-- to obtain a terminal on a CPU compute node within which you can execute your code,
-- or to directly execute your code on the CPU partition.
+### 1. `srun` command
+- Obtain a terminal on a CPU compute node within which you can execute your code,
+- Directly execute your code on the CPU or GPU partition.
 
-It is possible to open a terminal directly on a compute node on which the resources have been reserved for you (here 4 cores) by using the following command:
+<h5> Example 1: Connecting to a compute node </h5>
 
-#### Example 1: Connecting to a compute node 
 ```shell
 srun --pty --ntasks=1 bash
 ```
 - Running this command will redirect you directly to a compute node
 - An interactive terminal is obtained with the --pty option.
-- By default, the allocated CPU memory is proportional to the number of reserved cores. For example, if you request 1/4 of the cores of a node, you will have access to 1/4 of its memory.
-- In simlab 1 cpu = 8.7GB
-- In toubkal 1 cpu = 3.4GB
+- This command will allocate one task in the default partition (defq).
 
-#### Example 2: Running python script 
+<h5> Example 2: Running python script </h5>
+
 - Create file `script.py`
 ```python
 import socket
@@ -32,18 +31,20 @@ if __name__ == "__main__":
     host = get_host_info()
     print(f"Hostname: {host}")
 ```
-***Load the Python module***
-
-- Run the script
+- Load Python module, then run this command
 ```shell
 srun --ntasks=1 python3 script.py
 ```
+- This command will allocate one task in the default partition (defq).
+- The resources will be deallocated once the task is finished
+
 - Output:
 ```shell
 Hostname: node03
 ```
 
-### `salloc` command
+### 2. `salloc` command
+- This command will allow you to reserve CPU or GPU resources to run multiple execution.
 ```shell
 salloc --ntasks=1
 ```
@@ -69,8 +70,8 @@ JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
 JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
            2094639   compute     bash imad.kis  R       0:04      1 slurm-compute-h21a5-u14-svn1
 ```
-### `sbatch` command
-
+### 3. `sbatch` command
+- This command run jobs in the backend (recommended).
 - Create file `job.slurm`
 
 ```shell
@@ -86,25 +87,28 @@ module load Python/3.8.2-GCCcore-9.3.0
 python3 script.py
 ```
 - Run the job file
-```sbatch job.slurm
+```shell
+sbatch job.slurm
 ```
 - Output:
 ```shell
 Submitted batch job 5858478
 ```
-- Display jobs
+- Display job 5858478
 ```shell
 squeue -j 5858478
 ```
-***This command can display nothing if the job is very fast, but you can check the output of the job running***
+***This command can display nothing if the job is very fast, but you can check the job, running this command:***
 ```shell
 cat slurm-5858478.out
 ```
 ***The file slurm-jobid.out is generated automatically***
 
-## Check the available resources using `sinfo` and `squeue` commands
+## II. Check the available resources using `sinfo` and `squeue` commands
+- It's recommended to check the available resources before submitting a job to be sure that your job won't be waiting/pending.
 
-- `sinfo` command
+### 1. `sinfo` command
+- Display all partitions information
 ```shell
 sinfo
 ```
@@ -187,7 +191,7 @@ node[05,09-11,17] idle 0/220/0/220
 ```shell
 sinfo -o "%n %G %C %t %P" --noheader | grep -v -e "resv" -e "drain" -e "maint" | awk '{split($3,cpus,"/"); partition[$5]+=cpus[2]} END {for (p in partition) print p, partition[p]}'
 ```
-- Output:
+- Output in Simlab:
 ```shell
 special 253
 gpu 181
@@ -196,6 +200,69 @@ defq* 83
 visu 44
 longq 83
 ```
+- Output in Toubkal:
+```shell
+gpu 511
+himem 114
+compute* 19272
+```
+- Or In both Toubkal and Simlab add this command to `~/.bashrc` file, then tap `source ~/.bashrc`
+```shell
+alias cpusinfo='sinfo -o "%n %G %C %t %P" --noheader | grep -v -e "resv" -e "drain" -e "maint" | awk '\''{split($3,cpus,"/"); partition[$5]+=cpus[2]} END {for (p in partition) print p, partition[p]}'\'''
+```
+***You can run `cpusinfo` command to get the same output***
+
+### 2. `squeue` command
+
+- Display information for all jobs
+```shell
+squeue
+```
+- Output:
+```shell
+JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           5858549       gpu     bash ikissami PD       0:00      1 (Resources)
+           5857887     longq     Toth zakaria.  R 8-21:16:45      1 node15
+           5858432     longq jupyter- haitham.  R   22:25:01      1 node14
+           5858338     longq    ST_fn    safae  R 1-19:00:29      1 node14
+           5858335     longq   300_fn    safae  R 1-20:13:32      1 node14
+           5858334     longq 2_str_10    safae  R 1-20:18:16      1 node14
+           5858548       gpu     bash ikissami  R       3:09      1 node13
+           5858546       gpu     bash ikissami  R       3:37      1 node16
+ [...]
+ ```
+
+- Display only your jobs information
+```shell
+squeue -u $USER
+```
+- Output
+```shell
+ JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           5858549       gpu     bash ikissami PD       0:00      1 (Resources)
+           5858548       gpu     bash ikissami  R       4:04      1 node13
+           5858546       gpu     bash ikissami  R       4:32      1 node16
+```
+
+- Display a specific job information
+```shell
+squeue -j 5858548
+```
+- Ouput:
+```shell
+ JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           5858548       gpu     bash ikissami  R       4:26      1 node13
+```
+- Display the pending jobs
+```shell
+squeue -u $USER -t pending
+```
+- Output:
+```shell
+JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           5858549       gpu     bash ikissami PD       0:00      1 (Resources)
+```
+### 3. Useful commands
 - Display the available GPUs for the running jobs
     - In simlab there is only one GPU per node
     - In Toubkal there are 4 GPUs per node
@@ -214,14 +281,14 @@ v" | awk '\''{gsub(/[^0-9]/, "", $2); print $1, $2, $3}'\'''
 ```shell
 gpuspernode=1
 cpuspernode=44
-alias gpuinfo='squeue -t RUNNING --partition=gpu -o '\''%N %b %C'\'' | awk '\''NR>1 {split($2, gpuArray, ":"); nodes[$1]+=$2; gpus[$1]+=gpuArray[2]; cpus[$1]+=$3} END {print "nodename", "Available GPUs",\
+alias gpusinfo='squeue -t RUNNING --partition=gpu -o '\''%N %b %C'\'' | awk '\''NR>1 {split($2, gpuArray, ":"); nodes[$1]+=$2; gpus[$1]+=gpuArray[2]; cpus[$1]+=$3} END {print "nodename", "Available GPUs",\
  "Available CPUs"; for (node in nodes) print node, '$gpuspernode'-gpus[node], '$cpuspernode'-cpus[node]}'\'' && sinfo -p gpu --states=idle --noheader -o "%n %G %c" | grep -v -e "maint" -e "drain" -e "res\
 v" | awk '\''{gsub(/[^0-9]/, "", $2); print $1, $2, $3}'\'''
 ```
 
 - Display the information about GPU availability
 ```shell
-gpuinfo
+gpusinfo
 ```
 
 - Output in Simlab
@@ -240,7 +307,7 @@ node10 1 44
 node11 1 44
 node17 1 44
 ```
-***this means that node09, node10 and node11,node14 and node17 are available to be allocated***
+***This means that node09, node10 and node11,node14 and node17 are available to be allocated***
 
 - Output in Toubkal
 ```shell
@@ -250,18 +317,18 @@ slurm-a100-gpu-h22a2-u10-sv 1 125
 slurm-a100-gpu-h22a2-u22-sv 4 128
 slurm-a100-gpu-h22a2-u26-sv 4 128
 ```
-***this means that slurm-a100-gpu-h22a2-u10-sv, slurm-a100-gpu-h22a2-u22-sv and slurm-a100-gpu-h22a2-u26-sv are available to be allocated***
+***This means that slurm-a100-gpu-h22a2-u10-sv, slurm-a100-gpu-h22a2-u22-sv and slurm-a100-gpu-h22a2-u26-sv are available to be allocated***
 
 
-#### Slurm Parameters: nodes, tasks, cpus
+## III.  Slurm Parameters: nodes, partitions, tasks, memory, time
 
-- **--nodes**
+- **`--nodes`**
   - *number of nodes to use where a node is one computer unit of many in an HPC cluster (optional)*
     - `--nodes=1` \# request 1 node (optional since default=1)
     - *used for multi-node jobs*
       - `--nodes=2`
     - *if the number of cpus per node is not specified then defaults to 1 cpu*
-    - *defaults=1 node if `--nodes` not used & can use with `--ntasks-per-node` and `--cpus-per-task`
+    - ***defaults=1 node*** if `--nodes` not used 
 
 ```shell
 srun --nodes=2 --pty bash
@@ -270,21 +337,17 @@ srun --nodes=2 --pty bash
 ```shell
 srun: error: Unable to allocate resources: Node count specification invalid
 ```
-***The number of nodes that could be allocated in the `defq` partition is limited to 1.
+***The number of nodes that could be allocated in the `defq` partition is limited to 1.***
 
-- **--partition**
+- **`--partition`**
   - *specify a partition (queue)*
-- `defq`: partition is automatically used if no partition is specified by all jobs. The execution time by default is 4 hours.
-- `shortq`: partition used for short jobs (max. 12 hours), with max of two nodes per job (88 cores max.)
-- `longq`: partition used for long jobs (max 30 days), with only one node per job (44 cores max.).
-- `special`: used for running parallel jobs (max 30 minutes).
-- `visu`: partition used for visualization.
-- `gpu`: partition used for gpu computations (all nodes in this partition have gpu card P100 or P40), with max of two nodes per job (88 cores max.).
+
+### - In Simlab
 
 | Partition | Max. Cpu Time | Nodes available for the partition | Max nodes per job | Min-Max cores per job     |
 |-----------|---------------|-------------------------------------------------------|-------------------|---------------------------|
-| defq      | 4 hours       |              5 (node01, node02 node03, node14, node15)  |             1       |     1-44          |
-| shortq    | 12 hours      |              5 (node01, node02 node03, node14, node15)  |             2       |     1-88          |
+| defq      | 1 hour        |              5 (node01, node02 node03, node14, node15)  |             1       |     1-44          |
+| shortq    | 4 hours      |              5 (node01, node02 node03, node14, node15)  |             2       |     1-88          |
 | longq     | 30 days       |              5 (node01, node02 node03, node14, node15)  |             1       |     1-44          |
 | special   | 30 minutes    |              15 (all nodes)                             |            15       |     1-652         |
 | visu      | 24 hours      |              1  (visu01)                                |             1       |     1-44          |
@@ -298,7 +361,7 @@ srun --partition=shortq --nodes=2 --pty bash
 JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
            5858482    shortq     bash ikissami  R       0:06      2 node[03-04]
 ```
-- This command will reserve 2 nodes, with 1 cpu in each node and 2*8.7GB. To check this, run this command:
+- This command will reserve 2 nodes, with 1 cpu in each node and 2*8.7GB of memory. To check this, run this command:
 ```shell
 scontrol show jobid 5858482
 ```
@@ -328,11 +391,16 @@ JobId=5858482 JobName=bash
    Command=bash
    WorkDir=/home/ikissami/TRAINING
    Power=
-```  
-    - You can reserve a job using `gpu` partition with max of two nodes (88 cores)
-    - You can reserve a job using `special` partition with max of 15 nodes (652 cores)
+```
+  
+***You can reserve a job using `gpu` partition with max of two nodes (88 cores)***
+***You can reserve a job using `special` partition with max of 15 nodes (652 cores)***
+ 
+ ### - In Toubkal
+ 
+ 
     
-- **--ntasks**
+- **`--ntasks`**
   - *a task can be considered a command such as blastn, bwa, script.py, etc.*
     - `--ntasks=1` \# total tasks across all nodes per job
     - *when using `--ntasks` without `--nodes`, the values for `--ntasks-per-node` and `--cpus-per-task` will default to 1 node, 1 task per node, and 1 cpu per task*
@@ -392,10 +460,31 @@ srun --partition=shortq --ntasks=44 --pty bash
   - *max runtime for job (required); format: days-hours:minutes:seconds (days- is optional)*
     - `--time=24:00:00`   *# max runtime 24 hours (same as `--time=1-00:00:00`)*
     - `--time=7-00:00:00` *# max runtime 7 days*
-
+- Display the time limite for all jobs
+```shell
+squeue -l
+```
+- Output:
+```shell
+Sat Dec  9 15:06:00 2023
+             JOBID PARTITION     NAME     USER    STATE       TIME TIME_LIMI  NODES NODELIST(REASON)
+           5858461       gpu Delis.sl noureddi  RUNNING   18:54:26 2-00:00:00      1 node14
+           5858543    shortq     bash issam.ai  RUNNING    1:02:28   4:00:00      1 node03
+           5858550       gpu 3Dcamber sboughou  RUNNING       9:15 2-00:00:00      1 node17
+           5857887     longq     Toth zakaria.  RUNNING 8-21:37:30 25-06:00:00      1 node15
+           5858432     longq jupyter- haitham.  RUNNING   22:45:46 30-00:00:00      1 node14
+           5858338     longq    ST_fn    safae  RUNNING 1-19:21:14 30-00:00:00      1 node14
+           5858335     longq   300_fn    safae  RUNNING 1-20:34:17 30-00:00:00      1 node14
+           5858334     longq 2_str_10    safae  RUNNING 1-20:39:01 30-00:00:00      1 node14
+           5858542     longq       AI ilyas.bo  RUNNING    1:27:18 4-04:00:00      1 node05
+```
 - **--mem**
   - *total memory for each node (required)*
     - `--mem=376G` *# request 376GB total memory (max available on 384gb nodes)*
+
+- By default, the allocated CPU memory is proportional to the number of reserved cores. For example, if you request 1/4 of the cores of a node, you will have access to 1/4 of its memory.
+- In simlab 1 cpu = 8.7GB 
+- In toubkal 1 cpu = 3.4GB 
 
 - **--job-name**
   - *set the job name, keep it short and concise without spaces (optional but highly recommended)*
