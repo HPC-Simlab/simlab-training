@@ -187,32 +187,57 @@ node[05,09-11,17] idle 0/220/0/220
     - In simlab there is only one GPU per node
     - In Toubkal there are 4 GPUs per node
 
+- In Toubkal Add this command to `~/.bashrc` file, then tap `source ~/.bashrc`
 ```shell
-squeue -t RUNNING --partition=gpu -o '%b %N %C'
+gpuspernode=4
+cpuspernode=128
+alias gpuinfo='squeue -t RUNNING --partition=gpu -o '\''%N %b %C'\'' | awk '\''NR>1 {split($2, gpuArray, ":"); nodes[$1]+=$2; gpus[$1]+=gpuArray[3]; cpus[$1]+=$3} END {print "nodename", "Available GPUs",\
+ "Available CPUs"; for (node in nodes) print node, '$gpuspernode'-gpus[node], '$cpuspernode'-cpus[node]}'\'' && sinfo -p gpu --states=idle --noheader -o "%n %G %c" | grep -v -e "maint" -e "drain" -e "res\
+v" | awk '\''{gsub(/[^0-9]/, "", $2); print $1, $2, $3}'\'''
 ```
+
+- In Simlab Add this command to `~/.bashrc` file, then tap `source ~/.bashrc`
+```shell
+gpuspernode=1
+cpuspernode=44
+alias gpuinfo='squeue -t RUNNING --partition=gpu -o '\''%N %b %C'\'' | awk '\''NR>1 {split($2, gpuArray, ":"); nodes[$1]+=$2; gpus[$1]+=gpuArray[2]; cpus[$1]+=$3} END {print "nodename", "Available GPUs",\
+ "Available CPUs"; for (node in nodes) print node, '$gpuspernode'-gpus[node], '$cpuspernode'-cpus[node]}'\'' && sinfo -p gpu --states=idle --noheader -o "%n %G %c" | grep -v -e "maint" -e "drain" -e "res\
+v" | awk '\''{gsub(/[^0-9]/, "", $2); print $1, $2, $3}'\'''
+```
+
+- Display the information about GPU availability
+```shell
+gpuinfo
+```
+
 - Output in Simlab
 ```shell
 GRES NODELIST CPUS
-(null) node14 5  # means that the GPU is not used, and 5 CPUs are used over 44. You can allocate the GPU in this node with a max of 39 CPUs.
-(null) node06 5  # means that the GPU is not used, and 5 CPUs are used over 44. You can allocate the GPU in this node with a max of 39 CPUs.
-(null) node13 44 # means that the GPU is not used, but 44 CPUs are used. This node cannot be allocated (no free CPU).
-(null) node16 44 # means that the GPU is not used, but 44 CPUs are used. This node cannot be allocated (no free CPU).
-gpu:1 node08 44  # means that the GPU is used, and 44 CPUs are used. This node cannot be allocated (GPU unavailable and no free CPUs).
-gpu:1 node07 44  # means that the GPU is used, and 44 CPUs are used. This node cannot be allocated (GPU unavailable and no free CPUs).
-gpu:1 node12 44  # means that the GPU is used, and 44 CPUs are used. This node cannot be allocated (GPU unavailable and no free CPUs).
-gpu:1 node06 1   # means that the GPU is used, and 1 CPU is used. The GPU in this node cannot be reserved (43 free CPUs).
+nodename Available GPUs Available CPUs
+node07 0 0
+node16 1 0
+node08 0 0
+node12 0 0
+node13 1 0
+node14 1 39
+node06 0 38
+node09 1 44
+node10 1 44
+node11 1 44
+node17 1 44
 ```
-***this means that node09, node10 and node11 are available to be allocated***
+***this means that node09, node10 and node11,node14 and node17 are available to be allocated***
 
 - Output in Toubkal
 ```shell
-TRES_PER_NODE NODELIST CPUS
-gres:gpu:1 slurm-a100-gpu-h22a2-u10-sv 1 # means that the GPU is used, and 1 CPU is used. This node can be allocated (3 GPUs available and 55 free CPUs).
-gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1 # means that the GPU is used, and 1 CPU is used. This node can be allocated (3 GPUs available and 55 free CPUs).
-gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1 # means that the GPU is used, and 1 CPU is used. This node can be allocated (3 GPUs available and 55 free CPUs).
-gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1 # means that the GPU is used, and 1 CPU is used. This node can be allocated (3 GPUs available and 55 free CPUs).
-gres:gpu:1 slurm-a100-gpu-h22a2-u18-sv 1 # means that the GPU is used, and 1 CPU is used. This node can be allocated (3 GPUs available and 55 free CPUs).
+nodename Available GPUs Available CPUs
+slurm-a100-gpu-h22a2-u18-sv 0 124
+slurm-a100-gpu-h22a2-u10-sv 1 125
+slurm-a100-gpu-h22a2-u22-sv 4 128
+slurm-a100-gpu-h22a2-u26-sv 4 128
 ```
+***this means that slurm-a100-gpu-h22a2-u10-sv, slurm-a100-gpu-h22a2-u22-sv and slurm-a100-gpu-h22a2-u26-sv are available to be allocated***
+
 
 #### Slurm Parameters: nodes, tasks, cpus
 
