@@ -183,6 +183,19 @@ node[03-04,06,14],visu01 mix 110/110/0/220
 node[07-08,12-13,15-16] alloc 264/0/0/264
 node[05,09-11,17] idle 0/220/0/220
 ```
+- Display the available CPUs per partition in Simlab
+```shell
+sinfo -o "%n %G %C %t %P" --noheader | grep -v -e "resv" -e "drain" -e "maint" | awk '{split($3,cpus,"/"); partition[$5]+=cpus[2]} END {for (p in partition) print p, partition[p]}'
+```
+- Output:
+```shell
+special 253
+gpu 181
+shortq 83
+defq* 83
+visu 44
+longq 83
+```
 - Display the available GPUs for the running jobs
     - In simlab there is only one GPU per node
     - In Toubkal there are 4 GPUs per node
@@ -197,6 +210,7 @@ v" | awk '\''{gsub(/[^0-9]/, "", $2); print $1, $2, $3}'\'''
 ```
 
 - In Simlab Add this command to `~/.bashrc` file, then tap `source ~/.bashrc`
+
 ```shell
 gpuspernode=1
 cpuspernode=44
