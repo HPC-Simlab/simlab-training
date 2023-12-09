@@ -397,11 +397,93 @@ JobId=5858482 JobName=bash
 ***You can reserve a job using `special` partition with max of 15 nodes (652 cores)***
  
  ### - In Toubkal
- 
- 
-    
+1. Partitions
+
+| Partition | Nodes available for the partition | 
+|-----------|---------------|
+| compute  |     1219 |
+| himem    |       5  |
+| gpu     |        5  | 
+
+2. QOS
+
+| QOS              | Time Limit     | Max. allowed usage of resources per user     |
+|-------------------|---------------|---------------|
+| intr              | 01:00:00      | node=3        |
+| default-cpu       | 1-12:00:00    | cpu=3584      |
+| himem-cpu         | 1-12:00:00    | cpu=112       |
+| low-cpu           | 12:00:00      | node=16       |
+| default-gpu       | 1-00:00:00    | gres/gpu=8    |
+| low-gpu           | 12:00:00      | node=4        |
+| long-cpu          | 28-00:00:00   | cpu=1792      |
+| large-cpu         | 1-12:00:00    | cpu=7168      |
+| lowu-default-cpu  | 1-12:00:00    | cpu=7168      |
+| long-himem        | 7-00:00:00    | cpu=112       |
+| benchmark-cpu     | 1-12:00:00    | cpu=14336     |
+| long-gpu          | 7-00:00:00    | gres/gpu=4    |
+
+- Check the qos allowed for you (by defaut you are allowed to low-cpu and default-cpu).
+```shell
+sacctmgr show assoc where user=imad.kissami format=qos%30,account%50,partition
+```
+***Send an email to support-hpc@um6p.ma to get access to other qos***
+- Output:
+```shell
+                          QOS                                            Account  Partition 
+------------------------------ -------------------------------------------------- ---------- 
+                       low-gpu                         manapy-1wabcjwe938-low-gpu        gpu 
+              default-gpu,intr                     manapy-1wabcjwe938-default-gpu        gpu 
+                       low-cpu            manapy-um6p-st-msda-1wabcjwe938-low-cpu    compute 
+                       low-cpu            manapy-um6p-st-msda-1wabcjwe938-low-cpu      himem 
+    default-cpu,himem-cpu,intr        manapy-um6p-st-msda-1wabcjwe938-default-cpu    compute 
+    default-cpu,himem-cpu,intr        manapy-um6p-st-msda-1wabcjwe938-default-cpu      himem 
+```
+- Allocate resources in the gpu partition (run gpusinfo to check if there are available gpus):
+```shell
+srun --nodes=2 --partition=gpu --account=manapy-1wabcjwe938-default-gpu --gres=gpu:4 --pty bash
+```
+```shell
+squeue -u $SUSER
+```
+```shell
+JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           2096233       gpu     bash imad.kis  R       0:32      2 slurm-a100-gpu-h22a2-u18-sv,slurm-a100-gpu-h22a2-u22-sv
+```
+
+- Display job information
+```shell
+scontrol show job 2096233
+```
+- Output:
+```shell
+JobId=2096233 JobName=bash
+   UserId=imad.kissami(1853008732) GroupId=utilisateurs du domaine(1853000513) MCS_label=N/A
+   Priority=500 Nice=0 Account=manapy-1wabcjwe938-default-gpu QOS=default-gpu
+   JobState=RUNNING Reason=None Dependency=(null)
+   Requeue=1 Restarts=0 BatchFlag=0 Reboot=0 ExitCode=0:0
+   RunTime=00:00:47 TimeLimit=1-00:00:00 TimeMin=N/A
+   SubmitTime=2023-12-09T15:45:15 EligibleTime=2023-12-09T15:45:15
+   AccrueTime=Unknown
+   StartTime=2023-12-09T15:45:15 EndTime=2023-12-10T15:45:15 Deadline=N/A
+   PreemptEligibleTime=2023-12-09T15:45:15 PreemptTime=None
+   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2023-12-09T15:45:15 Scheduler=Main
+   Partition=gpu AllocNode:Sid=slurm-slurm-h22a8-u17-sv:2414105
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=slurm-a100-gpu-h22a2-u18-sv,slurm-a100-gpu-h22a2-u22-sv
+   BatchHost=slurm-a100-gpu-h22a2-u18-sv
+   NumNodes=2 NumCPUs=2 NumTasks=2 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   TRES=cpu=2,mem=16100M,node=2,billing=2,gres/gpu=8
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   MinCPUsNode=1 MinMemoryCPU=8050M MinTmpDiskNode=0
+   Features=(null) DelayBoot=00:00:00
+   OverSubscribe=OK Contiguous=0 Licenses=(null) Network=(null)
+   Command=bash
+   WorkDir=/home/imad.kissami
+   Power=
+   TresPerNode=gres:gpu:4
+   ```
 - **`--ntasks`**
-  - *a task can be considered a command such as blastn, bwa, script.py, etc.*
+  - *a task can be considered a command such as blastn, .exe, script.py, etc.*
     - `--ntasks=1` \# total tasks across all nodes per job
     - *when using `--ntasks` without `--nodes`, the values for `--ntasks-per-node` and `--cpus-per-task` will default to 1 node, 1 task per node, and 1 cpu per task*
 
