@@ -1,6 +1,10 @@
 
 <h1 align="center">Reservation commands</h1>
 
+## Simlab & Toubkal
+
+<img src="path/to/your/image.png" alt="Cluster Image" width="250">
+
 ## I. Reserve resources
 
 ### 1. `srun` command
