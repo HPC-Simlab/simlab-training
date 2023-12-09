@@ -322,7 +322,7 @@ slurm-a100-gpu-h22a2-u26-sv 4 128
 
 ## III.  Slurm Parameters: nodes, partitions, tasks, memory, time
 
-- **`--nodes`**
+### 1. `--nodes`
   - *number of nodes to use where a node is one computer unit of many in an HPC cluster (optional)*
     - `--nodes=1` \# request 1 node (optional since default=1)
     - *used for multi-node jobs*
@@ -438,6 +438,8 @@ sacctmgr show assoc where user=imad.kissami format=qos%30,account%50,partition
     default-cpu,himem-cpu,intr        manapy-um6p-st-msda-1wabcjwe938-default-cpu    compute 
     default-cpu,himem-cpu,intr        manapy-um6p-st-msda-1wabcjwe938-default-cpu      himem 
 ```
+**Example 1**
+
 - Allocate resources in the gpu partition (run gpusinfo to check if there are available gpus):
 ```shell
 srun --nodes=2 --partition=gpu --account=manapy-1wabcjwe938-default-gpu --gres=gpu:4 --pty bash
@@ -449,7 +451,6 @@ squeue -u $SUSER
 JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
            2096233       gpu     bash imad.kis  R       0:32      2 slurm-a100-gpu-h22a2-u18-sv,slurm-a100-gpu-h22a2-u22-sv
 ```
-
 - Display job information
 ```shell
 scontrol show job 2096233
@@ -482,12 +483,16 @@ JobId=2096233 JobName=bash
    Power=
    TresPerNode=gres:gpu:4
    ```
-- **`--ntasks`**
+  **Example 2**
+- Allocate resources in the himem partition (run cpusinfo to check if there are available cpus):
+```shell
+srun --nodes=1 --ntasks=1 --partition=himem --qos=himem-cpu --account=manapy-um6p-st-msda-1wabcjwe938-default-cpu --pty bash
+```
+   
+### 2. `--ntasks`
   - *a task can be considered a command such as blastn, .exe, script.py, etc.*
     - `--ntasks=1` \# total tasks across all nodes per job
-    - *when using `--ntasks` without `--nodes`, the values for `--ntasks-per-node` and `--cpus-per-task` will default to 1 node, 1 task per node, and 1 cpu per task*
-
-- Create file `mpiscript.py`
+  - Create file `mpiscript.py`
 ```python
 from mpi4py import MPI
 COMM = MPI.COMM_WORLD
@@ -535,13 +540,15 @@ or run this command if your application uses distributed computing (this command
 ```shell
 srun --partition=shortq --ntasks=44 --pty bash
 ```
+***You can specify the number of tasks per node using the option `--ntasks-per-node` unstead of `ntasks`.***
 
-#### Additional Slurm Parameters
-
-- **--time**
+### 3. `--time`
   - *max runtime for job (required); format: days-hours:minutes:seconds (days- is optional)*
     - `--time=24:00:00`   *# max runtime 24 hours (same as `--time=1-00:00:00`)*
     - `--time=7-00:00:00` *# max runtime 7 days*
+    - In Simlab, the time limite depends on the partition
+    - In Toubkal, the time limite depends on the qos
+   
 - Display the time limite for all jobs
 ```shell
 squeue -l
@@ -560,45 +567,260 @@ Sat Dec  9 15:06:00 2023
            5858334     longq 2_str_10    safae  RUNNING 1-20:39:01 30-00:00:00      1 node14
            5858542     longq       AI ilyas.bo  RUNNING    1:27:18 4-04:00:00      1 node05
 ```
-- **--mem**
+### 4. `--mem`
   - *total memory for each node (required)*
-    - `--mem=376G` *# request 376GB total memory (max available on 384gb nodes)*
-
-- By default, the allocated CPU memory is proportional to the number of reserved cores. For example, if you request 1/4 of the cores of a node, you will have access to 1/4 of its memory.
-- In simlab 1 cpu = 8.7GB 
-- In toubkal 1 cpu = 3.4GB 
-
-- **--job-name**
-  - *set the job name, keep it short and concise without spaces (optional but highly recommended)*
-    - `--job-name=myjob`
-
-- **--output**
-  - *save all stdout to a specified file (optional but highly recommended for debugging)*
-    - `--output=stdout.%x.%j` *# saves stdout to a file named stdout.jobname.JobID*
-
-- **--error**
-  - *save all stderr to a specified file (optional but highly recommended for debugging)*
-    - `--error=stderr.%x.%j` *# saves stderr to a file named stderr.jobname.JobID*
-    - *use just `--output` to save stdout and stderr to the same output file:* `--output=output.%j.log`
-
-#### Multi nodes & cores reservation
+    - `--mem=40G` *# request 40GB total memory per node*. If `--nodes=2`, means that the memory allocated will be 40G in each node.
+**Example**:
 ```shell
-#!/bin/bash                                                                                                                                                                                                 
+srun --partition=gpu  --nodes=2 --mem=40G --pty bash
+```
+***This command will allocate two nodes with 40GB in each node in the partition `gpu`.***
+- Check that using `scontrol`
+```shell
+squeue -u $USER
+```
+```shell
+ JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           5858555       gpu     bash ikissami  R       0:03      2 node[13-14]
+```
+```shell
+scontrol show job 5858555
+```
+```shell
+JobId=5858555 JobName=bash
+   UserId=ikissami(1063) GroupId=ikissami(1074) MCS_label=N/A
+   Priority=105684 Nice=0 Account=novec-account QOS=normal
+   JobState=RUNNING Reason=None Dependency=(null)
+   Requeue=1 Restarts=0 BatchFlag=0 Reboot=0 ExitCode=0:0
+   RunTime=00:02:31 TimeLimit=2-00:00:00 TimeMin=N/A
+   SubmitTime=2023-12-09T15:59:13 EligibleTime=2023-12-09T15:59:13
+   StartTime=2023-12-09T15:59:13 EndTime=2023-12-11T15:59:13 Deadline=N/A
+   PreemptTime=None SuspendTime=None SecsPreSuspend=0
+   LastSchedEval=2023-12-09T15:59:13
+   Partition=gpu AllocNode:Sid=master01:139308
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=node[13-14]
+   BatchHost=node13
+   NumNodes=2 NumCPUs=10 NumTasks=2 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   TRES=cpu=10,mem=80G,node=2,billing=10
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   MinCPUsNode=5 MinMemoryNode=40G MinTmpDiskNode=0
+   Features=(null) DelayBoot=00:00:00
+   Gres=(null) Reservation=(null)
+   OverSubscribe=OK Contiguous=0 Licenses=(null) Network=(null)
+   Command=bash
+   WorkDir=/home/ikissami
+   Power=
+```
+ ### - In Simlab
+ - In simlab 1 cpu = 8.7GB 
+ 
+| HOSTNAMES | MEMORY     | MEMORY PER CPU |
+|------------|------------|------------|
+| node01, node02     | 125 GB  | 8.7GB |
+| node03-node17     | 376 GB  |  8.7GB |
 
-#SBATCH --partition=gpu           # longq partition                                                                                                                                                         
-#SBATCH --job-name=mpijob         # keep job name short with no spaces                                                                                                                                      
-#SBATCH --time=1-00:00:00         # request 1 day; Format: days-hours:minutes:seconds                                                                                                                       
-#SBATCH --nodes=2                 # request 1 node (optional since default=1)                                                                                                                               
-#SBATCH --ntasks-per-node=2       # request 1 task (command) per node                                                                                                                                       
-#SBATCH --mem=7500M               # request 7.5GB total memory per node;                                                                                                                                    
-#SBATCH --output=stdout.%x.%j     # save stdout to a file with job name and JobID appended to file name                                                                                                     
-#SBATCH --error=stderr.%x.%j      # save stderr to a file with job name and JobID appended to file name                                                                                                     
+ 
+ ### - In Toubkal
 
-# unload any modules to start with a clean environment                                                                                                                                                      
+| Partition | MEMORY     | MEMORY PER CPU
+|------------|------------|------------|
+| compute     | 186 GB  |3.4GB|
+| himem     | 1.5 TB  | 13.5GB |
+| gpu     | 1 TB  | 8GB|
+
+***By default, the allocated CPU memory is proportional to the number of reserved cores. For example, if you request 1/4 of the cores of a node, you will have access to 1/4 of its memory.***
+
+**Example 1** (In simlab)
+- Allocate 2 cpus with 4GB
+```shell
+ srun --partition=gpu  --ntasks 2 --mem=4GB --pty bash
+```
+```shell
+squeue -u $USER 
+```
+```shell
+JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           5858557       gpu     bash ikissami  R       0:02      1 node06
+```
+```shell
+scontrol show jobid 5858557
+```
+```shell
+JobId=5858557 JobName=bash
+   UserId=ikissami(1063) GroupId=ikissami(1074) MCS_label=N/A
+   Priority=102906 Nice=0 Account=novec-account QOS=normal
+   JobState=RUNNING Reason=None Dependency=(null)
+   Requeue=1 Restarts=0 BatchFlag=0 Reboot=0 ExitCode=0:0
+   RunTime=00:00:14 TimeLimit=2-00:00:00 TimeMin=N/A
+   SubmitTime=2023-12-09T16:22:50 EligibleTime=2023-12-09T16:22:50
+   StartTime=2023-12-09T16:22:50 EndTime=2023-12-11T16:22:50 Deadline=N/A
+   PreemptTime=None SuspendTime=None SecsPreSuspend=0
+   LastSchedEval=2023-12-09T16:22:50
+   Partition=gpu AllocNode:Sid=master01:139308
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=node06
+   BatchHost=node06
+   NumNodes=1 NumCPUs=2 NumTasks=2 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   TRES=cpu=2,mem=4G,node=1,billing=2
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   MinCPUsNode=1 MinMemoryNode=4G MinTmpDiskNode=0
+   Features=(null) DelayBoot=00:00:00
+   Gres=(null) Reservation=(null)
+   OverSubscribe=OK Contiguous=0 Licenses=(null) Network=(null)
+   Command=bash
+   WorkDir=/home/ikissami
+   Power=
+```
+**Example 2** (In simlab)
+
+- Allocate 1 cpus with 20GB
+```shell
+ srun --partition=gpu  --ntasks 1 --mem=20GB --pty bash
+```
+```shell
+squeue -u $USER 
+```
+```shell
+JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           5858558       gpu     bash ikissami  R       0:03      1 node06
+```
+```shell
+scontrol show jobid 5858558
+```
+```shell
+JobId=5858558 JobName=bash
+   UserId=ikissami(1063) GroupId=ikissami(1074) MCS_label=N/A
+   Priority=102843 Nice=0 Account=novec-account QOS=normal
+   JobState=RUNNING Reason=None Dependency=(null)
+   Requeue=1 Restarts=0 BatchFlag=0 Reboot=0 ExitCode=0:0
+   RunTime=00:00:24 TimeLimit=2-00:00:00 TimeMin=N/A
+   SubmitTime=2023-12-09T16:24:22 EligibleTime=2023-12-09T16:24:22
+   StartTime=2023-12-09T16:24:22 EndTime=2023-12-11T16:24:22 Deadline=N/A
+   PreemptTime=None SuspendTime=None SecsPreSuspend=0
+   LastSchedEval=2023-12-09T16:24:22
+   Partition=gpu AllocNode:Sid=master01:139308
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=node06
+   BatchHost=node06
+   NumNodes=1 NumCPUs=3 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   TRES=cpu=3,mem=20G,node=1,billing=3
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   MinCPUsNode=3 MinMemoryNode=20G MinTmpDiskNode=0
+   Features=(null) DelayBoot=00:00:00
+   Gres=(null) Reservation=(null)
+   OverSubscribe=OK Contiguous=0 Licenses=(null) Network=(null)
+   Command=bash
+   WorkDir=/home/ikissami
+   Power=
+```
+***The number of allocated cpus is equal to 3, even if you asked only one. This is because to satisfy 20GB you need at least 3 cpus (3x8.7=26,1GB).***
+***So the rule is when you want to allocate a specific memory, check first if there are enough cpus***
+***In Toubkal the memory depends on the partition (see the table above).***
+
+### 5. `--job-name`
+ - *set the job name, keep it short and concise without spaces (optional but highly recommended)*
+   - `--job-name=myjob`
+```shell
+srun --partition=gpu --job-name=myjob --pty bash
+```
+```shell
+ssqueue 
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           5858559       gpu    myjob ikissami  R       0:03      1 node06
+```
+
+### 6. `--output` and `--error`
+- When you run a job using `sbatch`, a default file will be generated called `slurm-jobid.out`. This file will contain both the output of your execution and errors if there are any.
+- So to change the name of this default file, you can:
+    - *use just `--output` to save stdout and stderr to the same output file:* `--output=output.%j.log`
+	- *save all stdout to a specified file (optional but highly recommended for debugging)*
+	    - `--output=stdout.%x.%j` *# saves stdout to a file named stdout.jobname.JobID*
+	- *save all stderr to a specified file (optional but highly recommended for debugging)*
+	    - `--error=stderr.%x.%j` *# saves stderr to a file named stderr.jobname.JobID*
+
+**Example 1**
+- Create `job3.slurm`
+```shell
+#!/bin/bash
+
+#SBATCH --ntasks=1
+#SBATCH --output=output.%j.log
+sleep 30
+echo "this is test file"
+```
+- Run the job
+```shell
+sbatch job3.slurm
+```
+- Run `squeue -u $SUSER`
+```shell
+JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           5858562      defq job3.slu ikissami R       0:00      1 node03
+```
+- Display the content of the file
+```shell
+cat output.5858562.log
+```
+- Output:
+```shell
+this is test file
+```
+
+**Example 2:**
+
+- Create `job4.slurm`
+```shell
+#!/bin/bash
+
+#SBATCH --ntasks=1
+#SBATCH --output=stdout.%x.%j
+#SBATCH --error=stderr.%x.%j
+sleep 30
+echo "this is test file"
+module load bizzare
+```
+- Run the job
+```shell
+sbatch job4.slurm
+```
+- Run `squeue -u $SUSER`
+```shell
+JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           5858563      defq job4.slu ikissami  R       0:29      1 node03
+```
+- Display the content of the output file
+```shell
+cat stdout.job4.slurm.5858563
+```
+- Output:
+```shell
+this is test file
+```
+- Display the content of the error file
+```shell
+cat stderr.job4.slurm.5858563
+```
+- Output:
+```shell
+ERROR: Unable to locate a modulefile for 'bizzare'
+```
+
+## IV. Multi nodes & cores reservation
+```shell
+#!/bin/bash                                                                                                                                                                                           #SBATCH --partition=gpu           # longq partition
+#SBATCH --job-name=mpijob         # keep job name short with no spaces
+#SBATCH --time=1-00:00:00         # request 1 day; Format: days hours:minutes:seconds
+#SBATCH --nodes=2                 # request 1 node (optional since default=1)
+#SBATCH --ntasks-per-node=2       # request 1 task (command) per node
+#SBATCH --mem=7500M               # request 7.5GB total memory per node;
+#SBATCH --output=stdout.%x.%j     # save stdout to a file with job name and JobID appended to file name
+#SBATCH --error=stderr.%x.%j      # save stderr to a file with job name and JobID appended to file name
+
+# unload any modules to start with a clean environment
 module purge
-# load software modules                                                                                                                                                                                     
+# load software modules
 module load slurm Python/3.8.2-GCCcore-9.3.0 OpenMPI/4.0.3-GCC-9.3.0
-
 mpirun python3 mpiscript.py
 ```
 - Output: (display the content of stdout.jobname.jobid) 
@@ -614,22 +836,20 @@ the number of cpus is: 4
 ```shell
 #!/bin/bash                                                                                                                                                                                                 
 
-#SBATCH --partition=gpu           # longq partition                                                                                                                                    
-#SBATCH --job-name=gpujob         # keep job name short with no spaces                                                                                                                                      
-#SBATCH --time=1-00:00:00         # request 1 day; Format: days-hours:minutes:seconds                                                                                                                       
+#SBATCH --partition=gpu           # longq partition
+#SBATCH --job-name=gpujob         # keep job name short with no spaces 
+#SBATCH --time=1-00:00:00         # request 1 day; Format: days-hours:minutes:seconds 
 #SBATCH --nodes=2                 # request 1 node (optional since default=1)
-#SBATCH --gres=gpu:1              # request 1 GPU;                                                                                                                         
-#SBATCH --ntasks-per-node=2       # request 1 task (command) per node                                                                                                                                       
-#SBATCH --mem=7500M               # request 7.5GB total memory per node;                                                                                                                                    
-#SBATCH --output=stdout.%x.%j     # save stdout to a file with job name and JobID appended to file name                                                                                                     
-#SBATCH --error=stderr.%x.%j      # save stderr to a file with job name and JobID appended to file name                                                                                                     
+#SBATCH --gres=gpu:1              # request 1 GPU;         
+#SBATCH --ntasks-per-node=2       # request 1 task (command) per node
+#SBATCH --mem=7500M               # request 7.5GB total memory per node; 
+#SBATCH --output=stdout.%x.%j     # save stdout to a file with job name and JobID appended to file name 
+#SBATCH --error=stderr.%x.%j      # save stderr to a file with job name and JobID appended to file name   
 
-# unload any modules to start with a clean environment                                                                                                                                                      
+# unload any modules to start with a clean environment   
 module purge
-# load software modules                                                                                                                                                                                     
+# load software modules      
 module load slurm Python/3.8.2-GCCcore-9.3.0 OpenMPI/4.0.3-GCC-9.3.0
-
-
 ```
 - Output: (display the content of stdout.jobname.jobid) 
 ```shell
