@@ -1,9 +1,7 @@
-
 <h1 align="center">Reservation commands</h1>
 
 ## Simlab & Toubkal
 
-<img src="path/to/your/image.png" alt="Cluster Image" width="250">
 
 ## I. Reserve resources
 
@@ -11,7 +9,7 @@
 - Obtain a terminal on a CPU compute node within which you can execute your code,
 - Directly execute your code on the CPU or GPU partition.
 
-<h5> Example 1: Connecting to a compute node </h5>
+**Example 1: Connecting to a compute node**
 
 ```shell
 srun --pty --ntasks=1 bash
@@ -20,7 +18,7 @@ srun --pty --ntasks=1 bash
 - An interactive terminal is obtained with the --pty option.
 - This command will allocate one task in the default partition (defq).
 
-<h5> Example 2: Running python script </h5>
+**Example 2: Running python script**
 
 - Create file `script.py`
 ```python
@@ -37,7 +35,7 @@ if __name__ == "__main__":
 ```
 - Load Python module, then run this command
 ```shell
-srun --ntasks=1 python3 script.py
+module load Python/3.8.2-GCCcore-9.3.0 && srun --ntasks=1 python3 script.py
 ```
 - This command will allocate one task in the default partition (defq).
 - The resources will be deallocated once the task is finished
@@ -69,15 +67,21 @@ ssqueue
 JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
            5858476      defq     bash ikissami  R       0:35      1 node03
 ```
+- Now you can access to the requested resources (In this example node03)
+```shell
+ssh node03
+```
 - Output in Toubkal:
 ```shell
 JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
            2094639   compute     bash imad.kis  R       0:04      1 slurm-compute-h21a5-u14-svn1
 ```
+***You can now run `ssh slurm-compute-h21a5-u14-svn1`.***
+
 ### 3. `sbatch` command
+
 - This command run jobs in the backend (recommended).
 - Create file `job.slurm`
-
 ```shell
 #!/bin/bash
 
@@ -85,8 +89,10 @@ JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
 
 # unload any modules to start with a clean environment
 module purge
+
 # load software modules
 module load Python/3.8.2-GCCcore-9.3.0
+
 # run commands
 python3 script.py
 ```
@@ -98,15 +104,16 @@ sbatch job.slurm
 ```shell
 Submitted batch job 5858478
 ```
-- Display job 5858478
+- Display the information of the job 5858478
 ```shell
 squeue -j 5858478
 ```
-***This command can display nothing if the job is very fast, but you can check the job, running this command:***
+***This command can display nothing if the job is very fast.***
+***But you can check the job output, running this command:***
 ```shell
 cat slurm-5858478.out
 ```
-***The file slurm-jobid.out is generated automatically***
+***The file slurm-jobid.out is generated automatically.***
 
 ## II. Check the available resources using `sinfo` and `squeue` commands
 - It's recommended to check the available resources before submitting a job to be sure that your job won't be waiting/pending.
@@ -140,6 +147,58 @@ special      up      30:00      4    mix node[03-04,06,14]
 special      up      30:00      9  alloc node[07-10,12-13,15-17]
 special      up      30:00      2   idle node[05,11]
 ```
+<table>
+  <tr>
+    <th>Partition</th>
+    <th>Max. Cpu Time</th>
+    <th>Nodes available for the partition</th>
+    <th>Max nodes per job</th>
+    <th>Min-Max cores per job</th>
+  </tr>
+  <tr>
+    <td>defq</td>
+    <td>1 hour</td>
+    <td>7 (node[01-05], node14, node15)</td>
+    <td>1</td>
+    <td>1-44</td>
+  </tr>
+  <tr>
+    <td>shortq</td>
+    <td>4 hours</td>
+    <td>7 (node[01-05], node14, node15)</td>
+    <td>2</td>
+    <td>1-88</td>
+  </tr>
+  <tr>
+    <td>longq</td>
+    <td>30 days</td>
+    <td>7 (node[01-05], node14, node15)</td>
+    <td>1</td>
+    <td>1-44</td>
+  </tr>
+  <tr>
+    <td>special</td>
+    <td>30 minutes</td>
+    <td>17 (all nodes)</td>
+    <td>15</td>
+    <td>1-740</td>
+  </tr>
+  <tr>
+    <td>visu</td>
+    <td>24 hours</td>
+    <td>1 (visu01)</td>
+    <td>1</td>
+    <td>1-44</td>
+  </tr>
+  <tr>
+    <td>gpu</td>
+    <td>48 hours</td>
+    <td>12 (node[06-17])</td>
+    <td>2</td>
+    <td>1-88</td>
+  </tr>
+</table>
+
 - Output in Toubkal
 ```shell
 PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
@@ -153,6 +212,25 @@ gpu          up   infinite      1  maint slurm-a100-gpu-h22a2-u14-sv
 gpu          up   infinite      2    mix slurm-a100-gpu-h22a2-u10-sv,slurm-a100-gpu-h22a2-u18-sv
 gpu          up   infinite      2   idle slurm-a100-gpu-h22a2-u22-sv,slurm-a100-gpu-h22a2-u26-sv
 ```
+<table>
+  <tr>
+    <th>Partition</th>
+    <th>Nodes available for the partition</th>
+  </tr>
+  <tr>
+    <td>compute</td>
+    <td>1219</td>
+  </tr>
+  <tr>
+    <td>himem</td>
+    <td>5</td>
+  </tr>
+  <tr>
+    <td>gpu</td>
+    <td>5</td>
+  </tr>
+</table>
+
 - Display the state for each node 
 ```shell
 sinfo -o "%n %G %C %t"
@@ -350,10 +428,10 @@ srun: error: Unable to allocate resources: Node count specification invalid
 
 | Partition | Max. Cpu Time | Nodes available for the partition | Max nodes per job | Min-Max cores per job     |
 |-----------|---------------|-------------------------------------------------------|-------------------|---------------------------|
-| defq      | 1 hour        |              5 (node01, node02 node03, node14, node15)  |             1       |     1-44          |
-| shortq    | 4 hours      |              5 (node01, node02 node03, node14, node15)  |             2       |     1-88          |
-| longq     | 30 days       |              5 (node01, node02 node03, node14, node15)  |             1       |     1-44          |
-| special   | 30 minutes    |              15 (all nodes)                             |            15       |     1-652         |
+| defq      | 1 hour        |              7 (node01, node02 node03, node04, node05, node14, node15)  |             1       |     1-44          |
+| shortq    | 4 hours      |              7 (node01, node02 node03, node04, node05, node14, node15)  |             2       |     1-88          |
+| longq     | 30 days       |              7 (node01, node02 node03, node04, node05,node14, node15)  |             1       |     1-44          |
+| special   | 30 minutes    |              17 (all nodes)                             |            15       |     1-740         |
 | visu      | 24 hours      |              1  (visu01)                                |             1       |     1-44          |
 | gpu       | 48 hours      |              12 (node[06-17])                           |             2       |     1-88          |
 
@@ -401,14 +479,6 @@ JobId=5858482 JobName=bash
 ***You can reserve a job using `special` partition with max of 15 nodes (652 cores)***
  
  ### - In Toubkal
-1. Partitions
-
-| Partition | Nodes available for the partition | 
-|-----------|---------------|
-| compute  |     1219 |
-| himem    |       5  |
-| gpu     |        5  | 
-
 2. QOS
 
 | QOS              | Time Limit     | Max. allowed usage of resources per user     |
@@ -496,6 +566,26 @@ srun --nodes=1 --ntasks=1 --partition=himem --qos=himem-cpu --account=manapy-um6
 ### 2. `--ntasks`
   - *a task can be considered a command such as blastn, .exe, script.py, etc.*
     - `--ntasks=1` \# total tasks across all nodes per job
+
+**Example:** Multi tasks using OpenMPI
+- Display available version:
+```sh
+$ module avail OpenMPI
+----------------- /cm/shared/modulefiles ------------------
+OpenMPI/3.1.4-GCC-8.3.0  OpenMPI/4.0.3-GCC-9.3.0  OpenMPI/4.0.5-GCC-10.2.0 
+```
+- Load OpenMPI (version 4.0.3 compiled with GCC 9.3.0):
+```sh
+$ module load OpenMPI/4.0.3-GCC-9.3.0
+```
+- Install mpi4py using pip
+	- First load both OpenMPI and Python
+ ```sh
+module load  OpenMPI/4.0.3-GCC-9.3.0 Python/3.8.2-GCCcore-9.3.0 
+```
+```sh
+pip3 install mpi4py
+```
   - Create file `mpiscript.py`
 ```python
 from mpi4py import MPI
@@ -811,13 +901,15 @@ ERROR: Unable to locate a modulefile for 'bizzare'
 ```
 
 ## IV. Multi nodes & cores reservation
+
+### 1. Multi tasks using OpenMPI
+**Example 1:** 
 ```shell
 #!/bin/bash                                                                                                                                                                                           #SBATCH --partition=gpu           # longq partition
 #SBATCH --job-name=mpijob         # keep job name short with no spaces
 #SBATCH --time=1-00:00:00         # request 1 day; Format: days hours:minutes:seconds
 #SBATCH --nodes=2                 # request 1 node (optional since default=1)
-#SBATCH --ntasks-per-node=2       # request 1 task (command) per node
-#SBATCH --mem=7500M               # request 7.5GB total memory per node;
+#SBATCH --ntasks=8                # request 1 task (command) per node
 #SBATCH --output=stdout.%x.%j     # save stdout to a file with job name and JobID appended to file name
 #SBATCH --error=stderr.%x.%j      # save stderr to a file with job name and JobID appended to file name
 
@@ -832,21 +924,45 @@ mpirun python3 mpiscript.py
 cat stdout.mpijob.5858504 
 ```
 ```shell
-the number of cpus is: 4
+the number of cpus is: 8
+```
+
+**Example 2:**
+```shell
+#!/bin/bash  
+
+#SBATCH -J mpi_job #job name 
+#SBATCH --partition=gpu  
+#SBATCH --nodes=2 #2 different nodes     
+#SBATCH --tasks-per-node=8 #4 tasks per node
+#SBATCH --cpus-per-task=2 #2 cpu per task 
+#SBATCH --time=00:10:00 #job time limit 
+
+echo $SLURM_SUBMIT_DIR
+echo $SLURM_NTASKS
+echo $SLURM_NTASKS_PER_NODE
+
+cd $SLURM_SUBMIT_DIR
+mpirun -n $SLURM_NTASKS -npernode $SLURM_NTASKS_PER_NODE python3 mpiscript.py
+```
+
+```shell
+/home/ikissami/TRAINING
+16
+8
+the number of cpus is: 16
 ```
 
 #### Multi nodes & GPU reservation
 
 ```shell
-#!/bin/bash                                                                                                                                                                                                 
+#!/bin/bash 
 
 #SBATCH --partition=gpu           # longq partition
 #SBATCH --job-name=gpujob         # keep job name short with no spaces 
 #SBATCH --time=1-00:00:00         # request 1 day; Format: days-hours:minutes:seconds 
 #SBATCH --nodes=2                 # request 1 node (optional since default=1)
 #SBATCH --gres=gpu:1              # request 1 GPU;         
-#SBATCH --ntasks-per-node=2       # request 1 task (command) per node
-#SBATCH --mem=7500M               # request 7.5GB total memory per node; 
 #SBATCH --output=stdout.%x.%j     # save stdout to a file with job name and JobID appended to file name 
 #SBATCH --error=stderr.%x.%j      # save stderr to a file with job name and JobID appended to file name   
 
