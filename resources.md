@@ -1,3 +1,8 @@
+<style>
+table {width:50%;}
+table, th, td {border: 1px solid black;}
+</style>
+
 <h1 align="center">Reservation commands</h1>
 
 ## Simlab & Toubkal
@@ -152,50 +157,36 @@ special      up      30:00      2   idle node[05,11]
     <th>Partition</th>
     <th>Max. Cpu Time</th>
     <th>Nodes available for the partition</th>
-    <th>Max nodes per job</th>
-    <th>Min-Max cores per job</th>
   </tr>
   <tr>
     <td>defq</td>
     <td>1 hour</td>
     <td>7 (node[01-05], node14, node15)</td>
-    <td>1</td>
-    <td>1-44</td>
   </tr>
   <tr>
     <td>shortq</td>
     <td>4 hours</td>
     <td>7 (node[01-05], node14, node15)</td>
-    <td>2</td>
-    <td>1-88</td>
-  </tr>
+ </tr>
   <tr>
     <td>longq</td>
     <td>30 days</td>
     <td>7 (node[01-05], node14, node15)</td>
-    <td>1</td>
-    <td>1-44</td>
   </tr>
   <tr>
     <td>special</td>
     <td>30 minutes</td>
     <td>17 (all nodes)</td>
-    <td>15</td>
-    <td>1-740</td>
   </tr>
   <tr>
     <td>visu</td>
     <td>24 hours</td>
     <td>1 (visu01)</td>
-    <td>1</td>
-    <td>1-44</td>
   </tr>
   <tr>
     <td>gpu</td>
     <td>48 hours</td>
     <td>12 (node[06-17])</td>
-    <td>2</td>
-    <td>1-88</td>
   </tr>
 </table>
 
@@ -257,40 +248,28 @@ node11 gpu:1 0/44/0/44 idle
 node17 gpu:1 0/44/0/44 idle
 visu01 gpu:1 1/43/0/44 mix
 ```
-- Display the nodes for each state
-```shell
-sinfo -o "%N %t %C"
-```
-- Output in Simlab
-```shell
-NODELIST STATE CPUS(A/I/O/T)
-node[01-02] resv 0/80/0/80
-node[03-04,06,14],visu01 mix 110/110/0/220
-node[07-08,12-13,15-16] alloc 264/0/0/264
-node[05,09-11,17] idle 0/220/0/220
-```
 - Display the available CPUs per partition in Simlab
 ```shell
 sinfo -o "%n %G %C %t %P" --noheader | grep -v -e "resv" -e "drain" -e "maint" | awk '{split($3,cpus,"/"); partition[$5]+=cpus[2]} END {for (p in partition) print p, partition[p]}'
 ```
 - Output in Simlab:
 ```shell
-special 253
-gpu 181
-shortq 83
-defq* 83
-visu 44
-longq 83
+special  438
+gpu      366
+shortq   94
+defq*    94
+visu     44
+longq    94
 ```
 - Output in Toubkal:
 ```shell
-gpu 511
-himem 114
-compute* 19272
+gpu       511
+himem     114
+compute*  20682
 ```
 - Or In both Toubkal and Simlab add this command to `~/.bashrc` file, then tap `source ~/.bashrc`
 ```shell
-alias cpusinfo='sinfo -o "%n %G %C %t %P" --noheader | grep -v -e "resv" -e "drain" -e "maint" | awk '\''{split($3,cpus,"/"); partition[$5]+=cpus[2]} END {for (p in partition) print p, partition[p]}'\'''
+alias cpusinfo='sinfo -o "%n %G %C %t %P" --noheader | grep -v -e "resv" -e "drain" -e "maint" | awk '\''{split($3,cpus,"/"); partition[$5]+=cpus[2]} END {for (p in partition) print p, partition[p]}'\'' | colum -t'
 ```
 ***You can run `cpusinfo` command to get the same output***
 
@@ -345,27 +324,66 @@ JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
            5858549       gpu     bash ikissami PD       0:00      1 (Resources)
 ```
 ### 3. Useful commands
-- Display the available GPUs for the running jobs
+- Display the available GPUs 
     - In simlab there is only one GPU per node
     - In Toubkal there are 4 GPUs per node
+```shell
+sinfo -o "%n %G %C %t"
+```
+```shell
+HOSTNAMES GRES CPUS(A/I/O/T) STATE
+node01 (null) 0/40/0/40 resv
+node02 (null) 0/40/0/40 resv
+node03 (null) 30/14/0/44 mix
+node04 (null) 30/14/0/44 mix
+node14 gpu:1 22/22/0/44 mix
+node15 gpu:1 44/0/0/44 alloc
+node05 (null) 0/44/0/44 idle
+node06 gpu:1 1/43/0/44 mix
+node07 gpu:1 1/43/0/44 mix
+node13 gpu:1 1/43/0/44 mix
+node16 gpu:1 6/38/0/44 mix
+node10 gpu:1 44/0/0/44 alloc
+node12 gpu:1 44/0/0/44 alloc
+node08 gpu:1 0/44/0/44 idle
+node09 gpu:1 0/44/0/44 idle
+node11 gpu:1 0/44/0/44 idle
+node17 gpu:1 0/44/0/44 idle
+visu01 gpu:1 0/44/0/44 idle
+```
+***This command does not give exact information about the available GPUs***
+***When the state is mix for a node containing gpu, it does not mean that the gpu is not available***
+
+**Example:**
+- Allocate 1 task in the gpu partition
+```shell
+srun --partition=gpu --nodelist=node11 --pty bash
+```
+- Run `sinfo -o "%n %G %C %t" | grep node11`
+```shell
+node11 gpu:1 1/43/0/44 mix
+```
+- Now I can run `srun --partition=gpu --gres=gpu:1 --pty bash` to allocate the gpu
+- Run `sinfo -o "%n %G %C %t" | grep node11`
+```shell
+node11 gpu:1 2/43/0/44 mix
+```
+
+- In Simlab Add this command to `~/.bashrc` file, then tap `source ~/.bashrc`
+```shell
+gpuspernode=1
+cpuspernode=44
+alias gpusinfo='(squeue -t RUNNING -o "%N %b %C" | awk "NR>1 {split(\$2, gpuArray, \":\"); nodes[\$1]+=\$2; gpus[\$1]+=gpuArray[2]; cpus[\$1]+=\$3} END {for (node in nodes) print node, '$gpuspernode'-gpu\
+s[node], '$cpuspernode'-cpus[node]}" && sinfo -p gpu --states=idle --noheader -o "%n %G %c" | grep -v -e "maint" -e "drain" -e "resv" | awk "{gsub(/[^0-9]/, \"\", \$2); print \$1, \$2, \$3}") | grep -F "\
+$(sinfo -o "%n %G" | grep "gpu" | awk "{print \$1}")" | column -t'
+```
 
 - In Toubkal Add this command to `~/.bashrc` file, then tap `source ~/.bashrc`
 ```shell
 gpuspernode=4
 cpuspernode=128
-alias gpuinfo='squeue -t RUNNING --partition=gpu -o '\''%N %b %C'\'' | awk '\''NR>1 {split($2, gpuArray, ":"); nodes[$1]+=$2; gpus[$1]+=gpuArray[3]; cpus[$1]+=$3} END {print "nodename", "Available GPUs",\
- "Available CPUs"; for (node in nodes) print node, '$gpuspernode'-gpus[node], '$cpuspernode'-cpus[node]}'\'' && sinfo -p gpu --states=idle --noheader -o "%n %G %c" | grep -v -e "maint" -e "drain" -e "res\
-v" | awk '\''{gsub(/[^0-9]/, "", $2); print $1, $2, $3}'\'''
-```
-
-- In Simlab Add this command to `~/.bashrc` file, then tap `source ~/.bashrc`
-
-```shell
-gpuspernode=1
-cpuspernode=44
-alias gpusinfo='squeue -t RUNNING --partition=gpu -o '\''%N %b %C'\'' | awk '\''NR>1 {split($2, gpuArray, ":"); nodes[$1]+=$2; gpus[$1]+=gpuArray[2]; cpus[$1]+=$3} END {print "nodename", "Available GPUs",\
- "Available CPUs"; for (node in nodes) print node, '$gpuspernode'-gpus[node], '$cpuspernode'-cpus[node]}'\'' && sinfo -p gpu --states=idle --noheader -o "%n %G %c" | grep -v -e "maint" -e "drain" -e "res\
-v" | awk '\''{gsub(/[^0-9]/, "", $2); print $1, $2, $3}'\'''
+alias gpusinfo='(squeue -t RUNNING -p gpu -o "%N %b %C" | awk "NR>1 {split(\$2, gpuArray, \":\"); nodes[\$1]+=\$2; gpus[\$1]+=gpuArray[3]; cpus[\$1]+=\$3} END {for (node in nodes) print node, '$gpusperno\
+de'-gpus[node], '$cpuspernode'-cpus[node]}" && sinfo -p gpu --states=idle --noheader -o "%n %G %c" | grep -v -e "maint" -e "drain" -e "resv" | awk "{gsub(/[^0-9]/, \"\", \$2); print \$1, \$2, \$3}") | column -t'
 ```
 
 - Display the information about GPU availability
@@ -375,32 +393,29 @@ gpusinfo
 
 - Output in Simlab
 ```shell
-GRES NODELIST CPUS
-nodename Available GPUs Available CPUs
-node07 0 0
-node16 1 0
-node08 0 0
-node12 0 0
-node13 1 0
-node14 1 39
-node06 0 38
-node09 1 44
-node10 1 44
-node11 1 44
-node17 1 44
+node07  0  43
+node16  1  39
+node10  0  0
+node12  0  0
+node13  0  43
+node14  0  22
+node06  0  43
+node15  1  0
+node08  1  44
+node09  1  44
+node11  1  44
+node17  1  44
 ```
-***This means that node09, node10 and node11,node14 and node17 are available to be allocated***
+***This means that node08, node09, node11, node16 and node17 are available to be allocated***
 
 - Output in Toubkal
 ```shell
-nodename Available GPUs Available CPUs
 slurm-a100-gpu-h22a2-u18-sv 0 124
 slurm-a100-gpu-h22a2-u10-sv 1 125
 slurm-a100-gpu-h22a2-u22-sv 4 128
 slurm-a100-gpu-h22a2-u26-sv 4 128
 ```
 ***This means that slurm-a100-gpu-h22a2-u10-sv, slurm-a100-gpu-h22a2-u22-sv and slurm-a100-gpu-h22a2-u26-sv are available to be allocated***
-
 
 ## III.  Slurm Parameters: nodes, partitions, tasks, memory, time
 
@@ -415,29 +430,80 @@ slurm-a100-gpu-h22a2-u26-sv 4 128
 ```shell
 srun --nodes=2 --pty bash
 ```
+***This command will try to allocate two nodes => two cpus (one cpu per node).***
 ***Oups!!! It does not work***
 ```shell
 srun: error: Unable to allocate resources: Node count specification invalid
 ```
 ***The number of nodes that could be allocated in the `defq` partition is limited to 1.***
 
-- **`--partition`**
+### 2. `--partition`
   - *specify a partition (queue)*
 
 ### - In Simlab
 
-| Partition | Max. Cpu Time | Nodes available for the partition | Max nodes per job | Min-Max cores per job     |
-|-----------|---------------|-------------------------------------------------------|-------------------|---------------------------|
-| defq      | 1 hour        |              7 (node01, node02 node03, node04, node05, node14, node15)  |             1       |     1-44          |
-| shortq    | 4 hours      |              7 (node01, node02 node03, node04, node05, node14, node15)  |             2       |     1-88          |
-| longq     | 30 days       |              7 (node01, node02 node03, node04, node05,node14, node15)  |             1       |     1-44          |
-| special   | 30 minutes    |              17 (all nodes)                             |            15       |     1-740         |
-| visu      | 24 hours      |              1  (visu01)                                |             1       |     1-44          |
-| gpu       | 48 hours      |              12 (node[06-17])                           |             2       |     1-88          |
+<table>
+  <tr>
+    <th>Partition</th>
+    <th>Max. Cpu Time</th>
+    <th>Nodes available for the partition</th>
+    <th>Max nodes per job</th>
+    <th>Min-Max cores per job</th>
+  </tr>
+  <tr>
+    <td>defq</td>
+    <td>1 hour</td>
+    <td>7 (node[01-05], node14, node15)</td>
+    <td>1</td>
+    <td>1-44</td>
+  </tr>
+  <tr>
+    <td>shortq</td>
+    <td>4 hours</td>
+    <td>7 (node[01-05], node14, node15)</td>
+    <td>2</td>
+    <td>1-88</td>
+  </tr>
+  <tr>
+    <td>longq</td>
+    <td>30 days</td>
+    <td>7 (node[01-05], node14, node15)</td>
+    <td>1</td>
+    <td>1-44</td>
+  </tr>
+  <tr>
+    <td>special</td>
+    <td>30 minutes</td>
+    <td>17 (all nodes)</td>
+    <td>15</td>
+    <td>1-740</td>
+  </tr>
+  <tr>
+    <td>visu</td>
+    <td>24 hours</td>
+    <td>1 (visu01)</td>
+    <td>1</td>
+    <td>1-44</td>
+  </tr>
+  <tr>
+    <td>gpu</td>
+    <td>48 hours</td>
+    <td>12 (node[06-17])</td>
+    <td>2</td>
+    <td>1-88</td>
+  </tr>
+</table>
 
+***You can reserve a job using `gpu` partition with max of two nodes (88 cores)***
+***You can reserve a job using `special` partition with max of 17 nodes (740 cores)***
+
+**Example 1:** Reserving two node using `shorq` partition 
+- You are limited to 2 nodes per job 
+- Time limit fixed to 4 hours
 ```shell
 srun --partition=shortq --nodes=2 --pty bash
 ```
+
 - Display jobs information
 ```shell
 JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
@@ -474,27 +540,62 @@ JobId=5858482 JobName=bash
    WorkDir=/home/ikissami/TRAINING
    Power=
 ```
-  
-***You can reserve a job using `gpu` partition with max of two nodes (88 cores)***
-***You can reserve a job using `special` partition with max of 15 nodes (652 cores)***
- 
- ### - In Toubkal
-2. QOS
 
-| QOS              | Time Limit     | Max. allowed usage of resources per user     |
-|-------------------|---------------|---------------|
-| intr              | 01:00:00      | node=3        |
-| default-cpu       | 1-12:00:00    | cpu=3584      |
-| himem-cpu         | 1-12:00:00    | cpu=112       |
-| low-cpu           | 12:00:00      | node=16       |
-| default-gpu       | 1-00:00:00    | gres/gpu=8    |
-| low-gpu           | 12:00:00      | node=4        |
-| long-cpu          | 28-00:00:00   | cpu=1792      |
-| large-cpu         | 1-12:00:00    | cpu=7168      |
-| lowu-default-cpu  | 1-12:00:00    | cpu=7168      |
-| long-himem        | 7-00:00:00    | cpu=112       |
-| benchmark-cpu     | 1-12:00:00    | cpu=14336     |
-| long-gpu          | 7-00:00:00    | gres/gpu=4    |
+**Example 2:** Allocating resources in the `gpu` partition
+- The number of nodes is limited to 2 per job
+- The time limit is equal to 48 hours
+- You can allocate only cpus 
+- You can allocate max. of 2 gpus per job
+- Runing this command: `srun --partition=gpu --nodes=2 --pty bash`
+	- **does not mean automatically that you are using gpus!!**
+- To use gpus you need to add `--grep=gpu:1` (one gpu per node)
+
+```shell
+srun --partition=gpu --nodes=2 --gres=gpu:1 --pty bash
+```
+ ***This command will reserve 2 gpus in two different nodes.***
+```shell
+JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           5858659       gpu     bash ikissami  R       0:03      2 node[16-17]
+```
+
+### - In Toubkal
+1. Partition
+<table>
+  <tr>
+    <th>Partition</th>
+    <th>Nodes available for the partition</th>
+  </tr>
+  <tr>
+    <td>compute</td>
+    <td>1219</td>
+  </tr>
+  <tr>
+    <td>himem</td>
+    <td>5</td>
+  </tr>
+  <tr>
+    <td>gpu</td>
+    <td>5</td>
+  </tr>
+</table>
+
+3. Qos
+
+| QOS              | Time Limit     | Max. allowed usage of resources per user     | Max. for all jobs |
+|-------------------|---------------|---------------|-----------|
+| intr              | 01:00:00      | node=3        | |
+| default-cpu       | 1-12:00:00    | cpu=3584      | |
+| himem-cpu         | 1-12:00:00    | cpu=112       | |
+| low-cpu           | 12:00:00      | node=16       |  cpu=4129440 |
+| default-gpu       | 1-00:00:00    | gres/gpu=8    | |
+| low-gpu           | 12:00:00      | node=4        |gres/gpu=1200|
+| long-cpu          | 28-00:00:00   | cpu=1792      | |
+| large-cpu         | 1-12:00:00    | cpu=7168      | |
+| low-default-cpu  | 1-12:00:00    | cpu=7168      | |
+| long-himem        | 7-00:00:00    | cpu=112       | |
+| benchmark-cpu     | 1-12:00:00    | cpu=14336     | |
+| long-gpu          | 7-00:00:00    | gres/gpu=4    | |
 
 - Check the qos allowed for you (by defaut you are allowed to low-cpu and default-cpu).
 ```shell
@@ -563,7 +664,7 @@ JobId=2096233 JobName=bash
 srun --nodes=1 --ntasks=1 --partition=himem --qos=himem-cpu --account=manapy-um6p-st-msda-1wabcjwe938-default-cpu --pty bash
 ```
    
-### 2. `--ntasks`
+### 3. `--ntasks`
   - *a task can be considered a command such as blastn, .exe, script.py, etc.*
     - `--ntasks=1` \# total tasks across all nodes per job
 
@@ -599,11 +700,16 @@ if RANK==0: print("the number of cpus is:", SIZE)
 ```shell
 srun --partition=shortq --nodes=1 --ntasks=44 --pty bash
 ```
+***This command will allocate one node with 44 tasks***
 - Then run
 ```shell
  mpirun python3 mpiscript.py
 ```
-- Display job information after getting the jobid using `ssqueue` or `squeue -u $USER`
+- Display job information  after getting the jobid using `ssqueue` or `squeue -u $USER`
+```shell
+scontrol show jobid 5858486
+```
+
 ```shell
 JobId=5858486 JobName=bash
    UserId=ikissami(1063) GroupId=ikissami(1074) MCS_label=N/A
@@ -630,13 +736,17 @@ JobId=5858486 JobName=bash
    WorkDir=/home/ikissami/TRAINING
    Power=
 ```
-or run this command if your application uses distributed computing (this command can reserve more than one node if it's needed
+
+***If there is no node with 44 tasks available the job will be pending***
+
+- You can ask for 44 tasks without specifying the number of nodes. 
+	- This command can reserve more than one node if it's needed
 ```shell
 srun --partition=shortq --ntasks=44 --pty bash
 ```
 ***You can specify the number of tasks per node using the option `--ntasks-per-node` unstead of `ntasks`.***
 
-### 3. `--time`
+### 4. `--time`
   - *max runtime for job (required); format: days-hours:minutes:seconds (days- is optional)*
     - `--time=24:00:00`   *# max runtime 24 hours (same as `--time=1-00:00:00`)*
     - `--time=7-00:00:00` *# max runtime 7 days*
@@ -661,7 +771,73 @@ Sat Dec  9 15:06:00 2023
            5858334     longq 2_str_10    safae  RUNNING 1-20:39:01 30-00:00:00      1 node14
            5858542     longq       AI ilyas.bo  RUNNING    1:27:18 4-04:00:00      1 node05
 ```
-### 4. `--mem`
+**Example:**
+- If you have access to `low-gpu` qos in Toubkal, you're limited to 1200 minutes for all jobs
+
+| QOS              | Time Limit     | Max. allowed usage of resources per user     | Max. allowed usage of resources for all jobs |
+|-------------------|---------------|---------------|-----------|
+| low-gpu           | 12:00:00      | node=4        |gres/gpu=1200| 
+- Runing multiple batch files asking for 1 gpu 
+```shell
+#!/bin/bash
+
+#SBATCH --partition=gpu # partition name
+#SBATCH --account=manapy-1wabcjwe938-low-gpu 
+#SBATCH --nodes=1  # number of nodes to reserve
+#SBATCH --gres=gpu:1 # use 1 gpus (On toubkal each node has 4 gpus)
+
+sleep 100 
+```
+- The `low-gpu`  qos allows me to run job during 12 hours, with max of 4 nodes. For the example, let's submit this job 3 times.
+```shell
+sbatch batch_gpu.slurm
+sbatch batch_gpu.slurm
+sbatch batch_gpu.slurm
+```
+```shell
+JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           2100331       gpu batch_gp imad.kis PD       0:00      1 (QOSGrpGRESRunMinutes)
+           2100330       gpu batch_gp imad.kis PD       0:00      1 (QOSGrpGRESRunMinutes)
+           2100329       gpu batch_gp imad.kis  R       0:00      1 slurm-a100-gpu-h22a2-u10-sv
+```
+***Oups!!! 2 jobs are pending with reason: QOSGrpGRESRunMinutes***
+***This is due to Max. allowed usage of resources for all jobs, which is fixed to `gres/gpu=1200`=> 1200 minutes for all jobs***
+***When you don't specifiy the time limit using `--time`, the job takes the max. time lime allowed by the qos***
+-	In our case 12 hours. To check that run `squeue -l -u $USER`
+```shell
+OBID PARTITION     NAME     USER    STATE       TIME TIME_LIMI  NODES NODELIST(REASON)
+           2100429       gpu batch_gp imad.kis  PENDING       0:00  12:00:00      1 (QOSGrpGRESRunMinutes)
+           2100428       gpu batch_gp imad.kis  PENDING       0:00  12:00:00      1 (QOSGrpGRESRunMinutes)
+           2100427       gpu batch_gp imad.kis  RUNNING       0:01  12:00:00      1 slurm-a100-gpu-h22a2-u10-sv
+```
+***Here the max. time limites for all the jobs is equal to 12x3=36 hours=2160 minutes > 1200 minutes)***
+
+**Solution:**
+```shell
+#!/bin/bash
+
+#SBATCH --partition=gpu # partition name
+#SBATCH --account=manapy-1wabcjwe938-low-gpu 
+#SBATCH --nodes=1  # number of nodes to reserve
+#SBATCH --gres=gpu:1 # use 1 gpus (On toubkal each node has 4 gpus)
+#SBATCH --time=04:00:00 # max runtime 4 hours
+sleep 100 
+```
+- Run the jobs
+```shell
+sbatch batch_gpu.slurm
+sbatch batch_gpu.slurm
+sbatch batch_gpu.slurm
+```
+```shell
+Sun Dec 10 16:48:53 2023
+             JOBID PARTITION     NAME     USER    STATE       TIME TIME_LIMI  NODES NODELIST(REASON)
+           2100457       gpu batch_gp imad.kis  RUNNING       0:02   4:00:00      1 slurm-a100-gpu-h22a2-u10-sv
+           2100458       gpu batch_gp imad.kis  RUNNING       0:02   4:00:00      1 slurm-a100-gpu-h22a2-u10-sv
+           2100459       gpu batch_gp imad.kis  RUNNING       0:02   4:00:00      1 slurm-a100-gpu-h22a2-u10-sv
+```
+
+### 5. `--mem`
   - *total memory for each node (required)*
     - `--mem=40G` *# request 40GB total memory per node*. If `--nodes=2`, means that the memory allocated will be 40G in each node.
 **Example**:
@@ -812,7 +988,7 @@ JobId=5858558 JobName=bash
 ***So the rule is when you want to allocate a specific memory, check first if there are enough cpus***
 ***In Toubkal the memory depends on the partition (see the table above).***
 
-### 5. `--job-name`
+### 6. `--job-name`
  - *set the job name, keep it short and concise without spaces (optional but highly recommended)*
    - `--job-name=myjob`
 ```shell
@@ -824,7 +1000,7 @@ ssqueue
            5858559       gpu    myjob ikissami  R       0:03      1 node06
 ```
 
-### 6. `--output` and `--error`
+### 7. `--output` and `--error`
 - When you run a job using `sbatch`, a default file will be generated called `slurm-jobid.out`. This file will contain both the output of your execution and errors if there are any.
 - So to change the name of this default file, you can:
     - *use just `--output` to save stdout and stderr to the same output file:* `--output=output.%j.log`
@@ -900,81 +1076,3 @@ cat stderr.job4.slurm.5858563
 ERROR: Unable to locate a modulefile for 'bizzare'
 ```
 
-## IV. Multi nodes & cores reservation
-
-### 1. Multi tasks using OpenMPI
-**Example 1:** 
-```shell
-#!/bin/bash                                                                                                                                                                                           #SBATCH --partition=gpu           # longq partition
-#SBATCH --job-name=mpijob         # keep job name short with no spaces
-#SBATCH --time=1-00:00:00         # request 1 day; Format: days hours:minutes:seconds
-#SBATCH --nodes=2                 # request 1 node (optional since default=1)
-#SBATCH --ntasks=8                # request 1 task (command) per node
-#SBATCH --output=stdout.%x.%j     # save stdout to a file with job name and JobID appended to file name
-#SBATCH --error=stderr.%x.%j      # save stderr to a file with job name and JobID appended to file name
-
-# unload any modules to start with a clean environment
-module purge
-# load software modules
-module load slurm Python/3.8.2-GCCcore-9.3.0 OpenMPI/4.0.3-GCC-9.3.0
-mpirun python3 mpiscript.py
-```
-- Output: (display the content of stdout.jobname.jobid) 
-```shell
-cat stdout.mpijob.5858504 
-```
-```shell
-the number of cpus is: 8
-```
-
-**Example 2:**
-```shell
-#!/bin/bash  
-
-#SBATCH -J mpi_job #job name 
-#SBATCH --partition=gpu  
-#SBATCH --nodes=2 #2 different nodes     
-#SBATCH --tasks-per-node=8 #4 tasks per node
-#SBATCH --cpus-per-task=2 #2 cpu per task 
-#SBATCH --time=00:10:00 #job time limit 
-
-echo $SLURM_SUBMIT_DIR
-echo $SLURM_NTASKS
-echo $SLURM_NTASKS_PER_NODE
-
-cd $SLURM_SUBMIT_DIR
-mpirun -n $SLURM_NTASKS -npernode $SLURM_NTASKS_PER_NODE python3 mpiscript.py
-```
-
-```shell
-/home/ikissami/TRAINING
-16
-8
-the number of cpus is: 16
-```
-
-#### Multi nodes & GPU reservation
-
-```shell
-#!/bin/bash 
-
-#SBATCH --partition=gpu           # longq partition
-#SBATCH --job-name=gpujob         # keep job name short with no spaces 
-#SBATCH --time=1-00:00:00         # request 1 day; Format: days-hours:minutes:seconds 
-#SBATCH --nodes=2                 # request 1 node (optional since default=1)
-#SBATCH --gres=gpu:1              # request 1 GPU;         
-#SBATCH --output=stdout.%x.%j     # save stdout to a file with job name and JobID appended to file name 
-#SBATCH --error=stderr.%x.%j      # save stderr to a file with job name and JobID appended to file name   
-
-# unload any modules to start with a clean environment   
-module purge
-# load software modules      
-module load slurm Python/3.8.2-GCCcore-9.3.0 OpenMPI/4.0.3-GCC-9.3.0
-```
-- Output: (display the content of stdout.jobname.jobid) 
-```shell
-cat stdout.mpijob.5858504 
-```
-```shell
-the number of cpus is: 4
-```
