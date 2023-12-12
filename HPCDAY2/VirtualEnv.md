@@ -33,7 +33,18 @@ conda activate tensorflow-gpu
 ```
 ***You can now run tensorflow using gpus.***
 
-## Create a new virtual environment
+## Create a new virtual environment 
+**Be careful when installing new packages. The max. storage = 100GB**
+
+- Check the current home storage
+```shell
+du -sh /home/<login>
+```
+- Check the files/directories' storage
+```shell
+du -h --max-depth=1
+```
+
 - Load Anaconda3
 ```shell
 module load Anaconda3
@@ -43,9 +54,13 @@ module load Anaconda3
 ```shell
 conda create --name venv_name
 ```
-- Source the Anaconda environment
+- Source the Anaconda environment In Simlab
 ```shell
 source $ANACONDA_HOME/etc/profile.d/conda.sh
+```
+- Source the Anaconda environment In Toubkal
+```shell
+source /srv/software/easybuild/software/Anaconda3/2020.11/etc/profile.d/conda.sh
 ```
 - Activate the `venv_name` environment:
 ```shell
