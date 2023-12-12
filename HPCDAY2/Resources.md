@@ -7,7 +7,7 @@
 
 ### 1. `srun` command
 - Obtain a terminal on a CPU or GPU compute node within which you can execute your code,
-- Directly execute your code on the CPU or GPU partition.
+- Directly execute your code on the CPUs or GPUs.
 
 **Example 1: Connecting to a compute node**
 
