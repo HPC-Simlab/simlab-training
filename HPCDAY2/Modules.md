@@ -43,7 +43,6 @@ gcccuda/
 gcccuda/2018b
 gcccuda/2020b
 ```
-
 ### Load a module (default one)
 
 ```shell
