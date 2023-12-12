@@ -1112,6 +1112,7 @@ scontrol show reservation | tr ' ' '\n' | egrep "ReservationName=|StartTime=|End
 ReservationName=hpc_training	StartTime=2023-12-14T13:00:00	EndTime=2023-12-14T18:00:00	Nodes=node[06-13,16-17]
 ```
 ***You need to set the time limit before the start of the reservation***
+
 **Example**
 
 - Check the GPU availability
