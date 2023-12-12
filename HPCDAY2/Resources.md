@@ -1095,7 +1095,7 @@ Sometimes even if the CPUs and GPUs seems to be available but the job is pending
 
 - Check the reservations
 ```shell
-scontrol show reservation | tr ' ' '\n' | egrep "ReservationName=|StartTime=|EndTime=|Nodes=" | paste - - - -
+scontrol show reservation 
 ```
 
 ```shell
