@@ -17,6 +17,7 @@ srun --pty --ntasks=1 bash
 - Running this command will redirect you directly to a compute node
 - An interactive terminal is obtained with the --pty option.
 - This command will allocate one task in the default partition (defq).
+***run `python3 script.py`***
 
 **Example 2: Running python script**
 
