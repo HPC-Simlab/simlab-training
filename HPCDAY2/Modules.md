@@ -76,12 +76,13 @@ module purge
 No Modulefiles Currently Loaded
 ```
 ### Modules conflict handling
+**In simlab:** 
 - Load default GCC version
 ```shell
 module load GCC
 ```
 - Now try to load another GCC version
-- In simlab: 
+
 ```shell
 module load GCC/9.3.0
 ```
@@ -102,9 +103,22 @@ HINT: Might try "module unload GCCcore" first.
 ```
 ***Now GCCcore/9.3.0 create the conflict, because GCC depends on this module***
 
-**All modules finishing by `10.2.0` and `GCCcore-10.2.0` should be unloaded. In that case:**
+***All modules finishing by `10.2.0` and `GCCcore-10.2.0` should be unloaded. In that case:***
 - GCCcore/10.2.0, zlib/1.2.11-GCCcore-10.2.0, binutils/2.35-GCCcore-10.2.0 and GCC/10.2.0
-**The best solution is to `purge` all modules.**
+***The best solution is to `purge` all modules.***
+
+**In Toubkal**
+```shell
+module load GCC
+```
+```shell
+module load GCC/9.3.0
+```
+```shell
+Les modules suivants ont été rechargés avec un changement de version :
+  1) GCC/11.3.0 => GCC/9.3.0     2) GCCcore/11.3.0 => GCCcore/9.3.0     3) binutils/2.38-GCCcore-11.3.0 => binutils/2.34-GCCcore-9.3.0     4) zlib/1.2.12-GCCcore-11.3.0 => zlib/1.2.11-GCCcore-9.3.0
+```
+***The depend modules will be reloaded automatically with the new gcc version.***
 
 ### Add modules to `~/.bashrc` file
 
