@@ -163,6 +163,7 @@ special      up      30:00      4    mix node[03-04,06,14]
 special      up      30:00      9  alloc node[07-10,12-13,15-17]
 special      up      30:00      2   idle node[05,11]
 ```
+
 <table>
   <tr>
     <th>Partition</th>
@@ -1086,4 +1087,92 @@ cat stderr.job4.slurm.5858563
 ```shell
 ERROR: Unable to locate a modulefile for 'bizzare'
 ```
+
+**Remark**
+
+Sometimes even if the CPUs and GPUs seems to be available but the job is pending because there are some future reservations.
+
+- Check the reservations
+```shell
+scontrol show reservation | tr ' ' '\n' | egrep "ReservationName=|StartTime=|EndTime=|Nodes=" | paste - - - -
+```
+
+```shell
+ Nodes=node[06-13,16-17] NodeCnt=10 CoreCnt=440 Features=(null) PartitionName=(null) Flags=SPEC_NODES
+   TRES=cpu=440
+   Users=(null) Accounts=aait-account,acer-account,agbs-account,ai-account,ak-account,bps-account,cc-cs-account,chatgpt-account,ciam-account,cmsupport-account,crsa-account,cs-cs-account,d4r-account,eiea-account,emines-account,gsmi-account,gti-account,hpcadmin-account,hpcgadmin-account,iap-account,ilo-account,issb_p-account,it-dept-account,iwri-account,limset-account,mascir-account,mmekias-account,msda-account,msn-account,novec-account,ocpgrp-account,ocpsolutions-account,pclab-account,root,sboughou-account,sccs-dna-account,schrodinger-account,sci-account,simlab-account,susmat-account,susmatrc-account,techcell-account,tto-account,tuto-account,usmba-limas-account,vanguard-account,ventures-account Licenses=(null) State=INACTIVE BurstBuffer=(null) Watts=n/a
+```
+
+- Or
+```shell
+scontrol show reservation | tr ' ' '\n' | egrep "ReservationName=|StartTime=|EndTime=|Nodes=" | paste - - - -
+```
+
+```shell
+ReservationName=hpc_training	StartTime=2023-12-14T13:00:00	EndTime=2023-12-14T18:00:00	Nodes=node[06-13,16-17]
+```
+***You need to set the time limit before the start of the reservation***
+**Example**
+
+- Check the GPU availability
+```shell
+gpusinfo
+```
+```shell
+node07  0  3
+visu01  1  43
+node12  0  0
+node13  0  43
+node14  0  16
+node06  0  43
+node15  0  0
+node08  1  44
+node09  1  44
+node10  1  44
+node11  1  44
+node16  1  44
+node17  1  44
+```
+***At least one GPU node is available***
+- Check jobs status
+```shell
+squeue -l
+```
+```shell
+Tue Dec 12 20:22:11 2023
+             JOBID PARTITION     NAME     USER    STATE       TIME TIME_LIMI  NODES NODELIST(REASON)
+           5858849       gpu       D1 abdelmou  PENDING       0:00 2-00:00:00      1 (Resources)
+           5858850       gpu       D2 abdelmou  PENDING       0:00 2-00:00:00      1 (Priority)
+           5858851       gpu       RF abdelmou  PENDING       0:00 2-00:00:00      1 (Priority)
+           5858858       gpu jupyter-    swiam  PENDING       0:00 2-00:00:00      1 (Priority)
+           5858867       gpu       AI ilyas.bo  PENDING       0:00 2-00:00:00      1 (Priority)
+           5858868       gpu       AI ilyas.bo  PENDING       0:00 2-00:00:00      1 (Priority)
+           5858869       gpu       AI ilyas.bo  PENDING       0:00 2-00:00:00      1 (Priority)
+           5858870       gpu       AI ilyas.bo  PENDING       0:00 2-00:00:00      1 (Priority)
+           5858871       gpu       AI ilyas.bo  PENDING       0:00 2-00:00:00      1 (Priority)
+           5858872       gpu       AI ilyas.bo  PENDING       0:00 2-00:00:00      1 (Priority)
+```
+- Check the reservations:
+``````shell
+scontrol show reservation | tr ' ' '\n' | egrep "ReservationName=|StartTime=|EndTime=|Nodes=" | paste - - - -
+```
+```shell
+ReservationName=hpc_training	StartTime=2023-12-14T13:00:00	EndTime=2023-12-14T18:00:00	Nodes=node[06-13,16-17]
+```
+- Now lets fix the time limit
+```shell
+ srun --partition=gpu --nodes=1 --time=01:00:00 --gres=gpu:1 --pty bash
+```
+- Check jobs status
+```shell
+squeue -l -u $USER
+```
+
+```shell
+Tue Dec 12 20:25:44 2023
+             JOBID PARTITION     NAME     USER    STATE       TIME TIME_LIMI  NODES NODELIST(REASON)
+           5858896       gpu     bash ikissami  RUNNING       0:41   1:00:00      1 node16
+```
+
+***The new job is running***
 
