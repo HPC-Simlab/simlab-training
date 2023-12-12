@@ -364,6 +364,7 @@ node17 gpu:1 0/44/0/44 idle
 visu01 gpu:1 0/44/0/44 idle
 ```
 ***This command does not give exact information about the available GPUs***
+
 ***When the state is mix for a node containing gpu, it does not mean that the gpu is not available***
 
 **Example:**
