@@ -1,8 +1,3 @@
-<style>
-table {width:50%;}
-table, th, td {border: 1px solid black;}
-</style>
-
 <h1 align="center">Reservation commands</h1>
 
 ## Simlab & Toubkal
