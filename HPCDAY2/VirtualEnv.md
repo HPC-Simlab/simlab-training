@@ -44,7 +44,10 @@ du -sh /home/<login>
 ```shell
 du -h --max-depth=1
 ```
-
+- Display the files/directories' with size > 100MB
+```shell
+du -h --max-depth=1 /home/<login> | awk '$1 ~ /M$/ && $1+0 > 100 {print $1, $2}'
+```
 - Load Anaconda3
 ```shell
 module load Anaconda3
