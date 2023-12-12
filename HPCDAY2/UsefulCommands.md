@@ -54,14 +54,14 @@ $  scp -r <remote_directory> <login>@simlab-cluster.um6p.ma:<path/to/filename>
 ```
 
 ### Copy data to the remote host with synchronization
- For simple file transfers using a command line interface, you can use [scp](https://en.wikipedia.org/wiki/Secure_copy_protocol):  
+ For simple file transfers using a command line interface, you can use rsync:
 
 ```sh
 $  rsync -avz <filename>  <login>@simlab-cluster.um6p.ma:<remote_directory>
 ```
 
  ### Copy data from the remote host with synchronization
- For simple file transfers using a command line interface, you can use scp:  
+ For simple file transfers using a command line interface, you can use rsync:  
 
 ```sh
 $  rsync -avz <remote_directory> <login>@simlab-cluster.um6p.ma:<path/to/filename>
