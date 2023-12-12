@@ -40,9 +40,13 @@ module load Anaconda3
 ```shell
 conda create --name venv_name
 ```
-- Source the Anaconda environment
+- Source the Anaconda environment In Simlab
 ```shell
 source $ANACONDA_HOME/etc/profile.d/conda.sh
+```
+- Source the Anaconda environment In Toubkal
+```shell
+source /srv/software/easybuild/software/Anaconda3/2020.11/etc/profile.d/conda.sh
 ```
 - Activate the `venv_name` environment:
 ```shell
