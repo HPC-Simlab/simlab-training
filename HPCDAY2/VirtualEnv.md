@@ -40,7 +40,7 @@ conda activate tensorflow-gpu
 ```shell
 du -sh /home/<login>
 ```
-- Check the files/directories' storage
+- Check the files/directories' size
 ```shell
 du -h --max-depth=1
 ```
