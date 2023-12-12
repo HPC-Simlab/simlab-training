@@ -48,55 +48,10 @@ module purge
 
 No Modulefiles Currently Loaded
 ```
-### Install modules: EasyBuild
+### Add modules to bashrc file
 
-####  Load EasyBuild (version 4.4.2)
-
-```shell
-module load EasyBuild
-```
-#### Looking for available easyconfigs files (gmsh)
-```shell
-eb --modules-tool EnvironmentModules --module-syntax Tcl -S gmsh
-```
-```shell
-== found valid index for /cm/shared/apps/easybuild/4.4.2/lib/python3.5/site-packages/easybuild_easyconfigs-4.4.2-py3.5.egg/easybuild/easyconfigs, so using it...
-CFGS1=/cm/shared/apps/easybuild/4.4.2/lib/python3.5/site-packages/easybuild_easyconfigs-4.4.2-py3.5.egg/easybuild/easyconfigs
-* $CFGS1/g/gmsh/gmsh-3.0.6-foss-2017b-Python-2.7.14.eb
-* $CFGS1/g/gmsh/gmsh-3.0.6-foss-2018b-Python-3.6.6.eb
-* $CFGS1/g/gmsh/gmsh-4.2.2-foss-2018b-Python-3.6.6.eb
-[...]
-```
-#### Installation option
-
-- --robot: to enable dependency resolution.
-- --detect-loaded-modules=error: to print a clear error and stop when any (non-allowed) loaded modules are detected.
-- --detect-loaded-modules=purge: to run module purge if any (non-allowed) loaded modules are detected.
-- --optarch=GENERIC: to optimize for a generic processor architecture.
-
-#### Installing gmsh:
-```shell
-mkdir EASYBUILD
-```
+- Open `~/.bashrc` file, and add the modules that you load most of the time
 
 ```shell
- eb --modules-tool EnvironmentModules --module-syntax Tcl --prefix=$HOME/EASYBUILD --robot --detect-loaded-modules=error --detect-loaded-modules=purge --optarch=GENERIC gmsh-4.7.1-foss-2020a-Python-3.8.2.eb
+module load Python/3.8.2-GCCcore-9.3.0 
 ```
-- This command will install gmsh with all the dependencies
-  
-#### Add the installed packages to the available modules
-```shell
-module use $HOME/EASYBUILD/modules/all
-```
-#### List new avail modules
-```shell
-module use $HOME/EASYBUILD/modules/all
-```
-- Output:
-```shell
------------------------------------------------------------------------------------ /home/<login>/EASYBUILD/modules/all -----------------------------------------------------------------------------------
-gmsh/4.7.1-foss-2020a-Python-3.8.2  SLEPc/3.12.2-foss-2020a-Python-3.8.2  SWIG/4.0.1-GCCcore-9.3.0  
-```
-- Now you can load the modules
-
-
