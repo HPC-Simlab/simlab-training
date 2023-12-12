@@ -20,7 +20,7 @@ srun --pty --ntasks=1 bash
 
 **Example 2: Running python script**
 
-- Create file `script.py`
+- Run the python file `script.py`
 ```python
 import socket
 
