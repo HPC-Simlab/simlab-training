@@ -19,10 +19,13 @@ r_env                    /home/team1337/.local/easybuild_new/software/Anaconda3/
 renv                     /home/team1337/.local/easybuild_new/software/Anaconda3/2020.11/envs/renv
 tensorflow-gpu           /home/team1337/.local/easybuild_new/software/Anaconda3/2020.11/envs/tensorflow-gpu
 ```
-
-- Source the Anaconda environment
+- Source the Anaconda environment In Simlab
 ```shell
 source $ANACONDA_HOME/etc/profile.d/conda.sh
+```
+- Source the Anaconda environment In Toubkal
+```shell
+source /srv/software/easybuild/software/Anaconda3/2020.11/etc/profile.d/conda.sh
 ```
 - Activate the tensorflow (using gpu) environment:
 ```shell
