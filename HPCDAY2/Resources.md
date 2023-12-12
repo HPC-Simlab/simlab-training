@@ -1154,7 +1154,7 @@ Tue Dec 12 20:22:11 2023
            5858872       gpu       AI ilyas.bo  PENDING       0:00 2-00:00:00      1 (Priority)
 ```
 - Check the reservations:
-``````shell
+```shell
 scontrol show reservation | tr ' ' '\n' | egrep "ReservationName=|StartTime=|EndTime=|Nodes=" | paste - - - -
 ```
 ```shell
