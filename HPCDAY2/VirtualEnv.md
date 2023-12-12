@@ -32,3 +32,25 @@ source /srv/software/easybuild/software/Anaconda3/2020.11/etc/profile.d/conda.sh
 conda activate tensorflow-gpu
 ```
 ***You can now run tensorflow using gpus.***
+
+## Create a new virtual environment
+- Load Anaconda3
+```shell
+module load Anaconda3
+```
+
+- Create a new virtual environment
+```shell
+conda create --name venv_name
+```
+- Source the Anaconda environment
+```shell
+source $ANACONDA_HOME/etc/profile.d/conda.sh
+```
+- Activate the `venv_name` environment:
+```shell
+conda activate venv_name
+```
+- Installing a new package (eg. numpy)
+```shell
+conda install numpy
