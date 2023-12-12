@@ -108,9 +108,11 @@ HINT: Might try "module unload GCCcore" first.
 ***The best solution is to `purge` all modules.***
 
 **In Toubkal**
+- Load default GCC version
 ```shell
 module load GCC
 ```
+- Try again to load GCC/9.3.0
 ```shell
 module load GCC/9.3.0
 ```
