@@ -69,7 +69,7 @@ python3 ex3.py
 - Install numba using `pip install numba`
 - Run the code `ex4.py` to observe the performance comparison for different matrix sizes.
 - Analyze the results and observe how the execution times change with the matrix size.
-- Analyze the gpu usage using the command `nvitop`
+- Connect to the node requested and analyze the gpu usage using the command `nvitop`
 
 ```shell
 nvitop
