@@ -107,7 +107,7 @@ HINT: Might try "module unload GCCcore" first.
 
 ***So, all modules finishing by `10.2.0` and `GCCcore-10.2.0` should be unloaded. In that case:***
 - GCCcore/10.2.0, zlib/1.2.11-GCCcore-10.2.0, binutils/2.35-GCCcore-10.2.0 and GCC/10.2.0
-- 
+
 ***The best solution is to `purge` all modules.***
 
 **In Toubkal**
