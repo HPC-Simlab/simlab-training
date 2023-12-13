@@ -616,7 +616,7 @@ JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
 
 - Check the qos allowed for you (by defaut you are allowed to low-cpu and default-cpu).
 ```shell
-sacctmgr show assoc where user=<login> format=qos%30,account%50,partition
+sacctmgr show assoc where user=$USER format=qos%30,account%50,partition
 ```
 ***Send an email to support-hpc@um6p.ma to get access to other qos***
 - Output:
