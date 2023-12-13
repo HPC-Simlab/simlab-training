@@ -10,12 +10,12 @@
 	- login node: this is where users first login to stage their job scripts and do file and directory manipulations with text file editors and Unix commands.
 	- compute node; A cluster can contain a few compute nodes or thousands of compute nodes. These are often referred to as just nodes since jobs are only scheduled on the compute nodes.
 
-- Cores
+- Core
 	- Slurm refers to cores as cpus.
 	- there are 40/44 cores per node in Simlab, and 56 cores in Toubkal 
 	- up 384GB memory per node in Simlab & 1.5TB/node in Toubkal
 
-- Tasks
+- Task
   
 ## I. Reserve resources
 
