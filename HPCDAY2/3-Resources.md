@@ -1156,12 +1156,12 @@ print(estimate_pi($num_samples))
 - After `squeue -u $USER`
 ```shell
              JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
-         5858996_1       gpu pi_estim ikissami CF       0:00      1 node14
-         5858996_2       gpu pi_estim ikissami CF       0:00      1 node14
-         5858996_3       gpu pi_estim ikissami CF       0:00      1 node13
-         5858996_4       gpu pi_estim ikissami CF       0:00      1 node13
-         5858996_5       gpu pi_estim ikissami CF       0:00      1 node13
-         5858996_6       gpu pi_estim ikissami CF       0:00      1 node13
+         5859016_1       gpu pi_estim ikissami  R       0:00      1 node14
+         5859016_2       gpu pi_estim ikissami  R       0:00      1 node14
+         5859016_3       gpu pi_estim ikissami  R       0:00      1 node13
+         5859016_4       gpu pi_estim ikissami  R       0:00      1 node13
+         5859016_5       gpu pi_estim ikissami  R       0:00      1 node13
+         5859016_6       gpu pi_estim ikissami  R       0:00      1 node16
 ```
 
 ### 9. `--constraint`
