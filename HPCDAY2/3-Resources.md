@@ -2,10 +2,21 @@
 
 ## Simlab & Toubkal
 
-<img src="data/Toubkal-Simlab.png" alt="Example Image" width="900" height="600">
+<img src="data/Toubkal-Simlab.png" alt="Example Image" >
 
+## Some definition
 
+- A node is one computer unit of an HPC cluster each containing memory and one or more CPUs. There are generally two classifications of nodes; login and compute. 
+	- login node: this is where users first login to stage their job scripts and do file and directory manipulations with text file editors and Unix commands.
+	- compute node; A cluster can contain a few compute nodes or thousands of compute nodes. These are often referred to as just nodes since jobs are only scheduled on the compute nodes.
 
+- Cores
+	- Slurm refers to cores as cpus.
+	- there are 40/44 cores per node in Simlab, and 56 cores in Toubkal 
+	- up 384GB memory per node in Simlab & 1.5TB/node in Toubkal
+
+- Tasks
+  
 ## I. Reserve resources
 
 ### 1. `srun` command
