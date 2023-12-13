@@ -2,19 +2,11 @@
 
 ## Simlab & Toubkal
 
+<img src="data/Toubkal&Simlab.png" alt="Example Image" width="300" height="200">
+
 
 
 ## I. Reserve resources
-
-- In simlab:
-```shell
-module load slurm
-```
-
-- In Toubkal:
-```shell
-module load slurm-aux
-```
 
 ### 1. `srun` command
 - Obtain a terminal on a CPU or GPU compute node within which you can execute your code,
