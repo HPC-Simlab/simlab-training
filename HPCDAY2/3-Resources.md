@@ -830,6 +830,7 @@ OBID PARTITION     NAME     USER    STATE       TIME TIME_LIMI  NODES NODELIST(R
 ***Here the max. time limites for all the jobs is equal to 12x3=36 hours=2160 minutes > 1200 minutes)***
 
 **Solution:**
+- Cancel all the jobs and add `--time` option to limite the time
 ```shell
 #!/bin/bash
 
@@ -852,6 +853,12 @@ Sun Dec 10 16:48:53 2023
            2100457       gpu batch_gp imad.kis  RUNNING       0:02   4:00:00      1 slurm-a100-gpu-h22a2-u10-sv
            2100458       gpu batch_gp imad.kis  RUNNING       0:02   4:00:00      1 slurm-a100-gpu-h22a2-u10-sv
            2100459       gpu batch_gp imad.kis  RUNNING       0:02   4:00:00      1 slurm-a100-gpu-h22a2-u10-sv
+```
+- Or, update the time limit for the current jobs using `scontrol` commad.
+```shell
+scontrol update jobid=2100457 Timelimit=04:00:00
+scontrol update jobid=2100458 Timelimit=04:00:00
+scontrol update jobid=2100459 Timelimit=04:00:00
 ```
 
 ### 5. `--mem`
