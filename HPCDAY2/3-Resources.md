@@ -26,7 +26,7 @@
 **Example 1: Connecting to a compute node**
 
 ```shell
-srun --pty --ntasks=1 bash
+srun --ntasks=1 --pty bash
 ```
 - Running this command will redirect you directly to a compute node
 - An interactive terminal is obtained with the --pty option.
@@ -83,7 +83,7 @@ ssqueue
 JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
            5858476      defq     bash ikissami  R       0:35      1 node03
 ```
-- Now you can access to the requested resources (In this example node03)
+- You can either run a command in the current terminal or access to the requested resources from another terminal (In this example node03)
 ```shell
 ssh node03
 ```
