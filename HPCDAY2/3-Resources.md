@@ -488,7 +488,7 @@ srun: error: Unable to allocate resources: Node count specification invalid
     <td>special</td>
     <td>30 minutes</td>
     <td>17 (all nodes)</td>
-    <td>15</td>
+    <td>17</td>
     <td>1-740</td>
   </tr>
   <tr>
