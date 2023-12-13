@@ -2,7 +2,7 @@
 
 ## Simlab & Toubkal
 
-<img src="data/Toubkal&Simlab.png" alt="Example Image" width="300" height="200">
+<img src="data/Toubkal-Simlab.png" alt="Example Image" width="300" height="200">
 
 
 
