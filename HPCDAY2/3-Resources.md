@@ -508,6 +508,7 @@ srun: error: Unable to allocate resources: Node count specification invalid
 </table>
 
 ***You can reserve a job using `gpu` partition with max of two nodes (88 cores)***
+
 ***You can reserve a job using `special` partition with max of 17 nodes (740 cores)***
 
 **Example 1:** Reserving two node using `shorq` partition 
@@ -566,7 +567,9 @@ JobId=5858482 JobName=bash
 ```shell
 srun --partition=gpu --nodes=2 --gres=gpu:1 --pty bash
 ```
+
  ***This command will reserve 2 gpus in two different nodes.***
+
 ```shell
 JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
            5858659       gpu     bash ikissami  R       0:03      2 node[16-17]
