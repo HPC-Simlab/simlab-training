@@ -830,7 +830,12 @@ OBID PARTITION     NAME     USER    STATE       TIME TIME_LIMI  NODES NODELIST(R
 ***Here the max. time limites for all the jobs is equal to 12x3=36 hours=2160 minutes > 1200 minutes)***
 
 **Solution:**
+
 - Cancel all the jobs and add `--time` option to limite the time
+	- `scancel JOBID`
+	- `scancel -u <username>`
+	- `scancel -t PENDING -u <username>`
+
 ```shell
 #!/bin/bash
 
