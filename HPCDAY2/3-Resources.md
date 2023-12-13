@@ -1,3 +1,4 @@
+
 <h1 align="center">Reservation commands</h1>
 
 ## Simlab & Toubkal
@@ -1092,7 +1093,74 @@ cat stderr.job4.slurm.5858563
 ERROR: Unable to locate a modulefile for 'bizzare'
 ```
 
-**Remark**
+### 8. `--array`
+
+- Array jobs are good to use when you have multiple samples each of which can utilize an entire compute node running software that
+supports multiple threads but does not support MPI
+	- `--array=0-23` # job array indexes 0-23
+	- `--array=1-24` # job array indexes 1-24
+	- `--array=1,3,5,7` # job array indexes 1,3,5,7
+	- `--array=1-7:2` # job array indexes 1 to 7 with a step size of 2 do not use `--nodes` with `--array`
+ 
+- Use the index value to select which commands to run either from a text file of commands or as part of the input file name or parameter value
+	- `$SLURM_ARRAY_TASK_ID` is the array index value
+
+- stdout and stderr files can be saved per index value
+	- `--output=stdout.%x.%A_%a`
+	- `--error=stderr.%x.%A_%a`
+- maximum array size is 1000 and max total pending and running jobs per user is 1000
+	- Limit the number of simultaneously running tasks
+	- can help prevent reaching file and disk quotas due to many intermediate and temporary files
+	- as one job completes another array index is run on an available node
+	- `--array=1-40%5` # job array with indexes 1-40; max of 5 running array jobs
+
+**Example:**
+
+```shell
+#!/bin/bash
+#SBATCH --jobname=pi_estimation 
+#SBATCH --partition=gpu 
+#SBATCH -n 6
+#SBATCH --array=1-6
+
+# Load python module                                                                                                                                                                                       module load Python/3.8.2-GCCcore-9.3.0
+
+# Define the array of num_samples                                                                                                                                                                           
+num_samples_array=(1000 10000 100000 1000000 10000000 100000000)
+
+# Get the num_samples for this task
+num_samples=${num_samples_array[$SLURM_ARRAY_TASK_ID-1]}
+
+# Run the python script
+python -c "
+import random                                                                                                                                                                                              def estimate_pi(num_samples):                                                                                                                                                                                  num_inside_circle = 0
+    for _ in range(num_samples): 
+        x = random.uniform(-1, 1) 
+        y = random.uniform(-1, 1) 
+        distance = x**2 + y**2
+                                                                                                                                                                                                            
+        if distance <= 1: 
+            num_inside_circle += 1
+            
+    return 4 * num_inside_circle / num_samples 
+print(estimate_pi($num_samples))
+"
+```
+- After `squeue -u $USER`
+```shell
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+         5858996_1       gpu pi_estim ikissami CF       0:00      1 node14
+         5858996_2       gpu pi_estim ikissami CF       0:00      1 node14
+         5858996_3       gpu pi_estim ikissami CF       0:00      1 node13
+         5858996_4       gpu pi_estim ikissami CF       0:00      1 node13
+         5858996_5       gpu pi_estim ikissami CF       0:00      1 node13
+         5858996_6       gpu pi_estim ikissami CF       0:00      1 node13
+```
+
+### 9. `--constraint`
+
+
+### Remark 
 
 Sometimes even if the CPUs and GPUs seems to be available but the job is pending because there are some future reservations.
 
