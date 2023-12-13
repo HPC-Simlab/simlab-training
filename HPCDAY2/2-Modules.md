@@ -135,4 +135,4 @@ module load Python/3.8.2-GCCcore-9.3.0
 ```shell
 source ~/.bashrc
 ```
-***You no longer need to load Python/3.8.2-GCCcore-9.3.0.***
+***You no longer need to load Python/3.8.2-GCCcore-9.3.0, after each connection.***
