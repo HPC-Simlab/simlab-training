@@ -2,11 +2,6 @@
 
 ## Simlab & Toubkal
 
-- Unload all modules
-```shell
-module purge
-```
-
 ## I. Reserve resources
 
 - In simlab:
