@@ -39,30 +39,28 @@ $ ssh-copy-id <login>@simlab-cluster.um6p.ma
 ```
 It copies your public key in the file `$HOME/.ssh/authorized_keys` on SIMLAB.
 
-### Copy data to the remote host <a name="copytoremote"></a> without syncronization
- For simple file transfers using a command line interface, you can use [scp](https://en.wikipedia.org/wiki/Secure_copy_protocol):  
+### Copy data to the remote host <a name="copytoremote"></a> 
+
+- Without synchronization ([scp](https://en.wikipedia.org/wiki/Secure_copy_protocol))
 
 ```sh
 $  scp -r <filename>  <login>@simlab-cluster.um6p.ma:<remote_directory>
 ```
+- With synchronization (rsync):
+```sh
+$  rsync -avz <filename>  <login>@simlab-cluster.um6p.ma:<remote_directory>
+```
 
- ### Copy data from the remote host <a name="copytohost"></a> without syncronization
- For simple file transfers using a command line interface, you can use scp:  
+ ### Copy data from the remote host <a name="copytohost"></a> 
+
+- Without synchronization (scp):
 
 ```sh
 $  scp -r <remote_directory> <login>@simlab-cluster.um6p.ma:<path/to/filename>
 ```
 
-### Copy data to the remote host with synchronization
- For simple file transfers using a command line interface, you can use rsync:
-
-```sh
-$  rsync -avz <filename>  <login>@simlab-cluster.um6p.ma:<remote_directory>
-```
-
- ### Copy data from the remote host with synchronization
- For simple file transfers using a command line interface, you can use rsync:  
-
+- With synchronization (rsync):
+ 
 ```sh
 $  rsync -avz <remote_directory> <login>@simlab-cluster.um6p.ma:<path/to/filename>
 ```
