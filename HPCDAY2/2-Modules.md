@@ -123,7 +123,7 @@ module load GCC/9.3.0
 Les modules suivants ont été rechargés avec un changement de version :
   1) GCC/11.3.0 => GCC/9.3.0     2) GCCcore/11.3.0 => GCCcore/9.3.0     3) binutils/2.38-GCCcore-11.3.0 => binutils/2.34-GCCcore-9.3.0     4) zlib/1.2.12-GCCcore-11.3.0 => zlib/1.2.11-GCCcore-9.3.0
 ```
-***The depend modules will be reloaded automatically with the new GCC version.***
+***The dependent modules will be reloaded automatically with the new GCC version.***
 
 ### Add modules to `~/.bashrc` file
 
