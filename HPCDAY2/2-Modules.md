@@ -101,9 +101,11 @@ module load GCC/9.3.0
 WARNING: GCCcore/9.3.0 cannot be loaded due to a conflict.
 HINT: Might try "module unload GCCcore" first.
 ```
-***Now GCCcore/9.3.0 create the conflict, because GCC depends on this module***
+***Now GCCcore/9.3.0 create the conflict because when loading GCC/10.2.0, GCCcore/10.2.0 is loaded.***
 
-***All modules finishing by `10.2.0` and `GCCcore-10.2.0` should be unloaded. In that case:***
+***The same conflicts will be raised for all dependent packages***
+
+***So, all modules finishing by `10.2.0` and `GCCcore-10.2.0` should be unloaded. In that case:***
 - GCCcore/10.2.0, zlib/1.2.11-GCCcore-10.2.0, binutils/2.35-GCCcore-10.2.0 and GCC/10.2.0
 ***The best solution is to `purge` all modules.***
 
