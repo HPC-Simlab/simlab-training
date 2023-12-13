@@ -1158,9 +1158,15 @@ print(estimate_pi($num_samples))
 ```
 
 ### 9. `--constraint`
+- The `--constraint` option in Slurm is used to specify hardware or feature constraints for the nodes on which the job should run
+- In Simlab for example, you can specify the type of the GPU (V100, P40) when asking resources:
+	
+**Example:**
+```shell
+srun --partition=gpu --nodes=1 --constraint=V100 --gres=gpu:1 --pty bash
+```
 
-
-### Remark 
+## Remark 
 
 Sometimes even if the CPUs and GPUs seems to be available but the job is pending because there are some future reservations.
 
