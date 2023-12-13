@@ -335,7 +335,7 @@ squeue -u $USER -t pending
 JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
            5858549       gpu     bash ikissami PD       0:00      1 (Resources)
 ```
-### 3. Useful commands
+### 3. Useful commands (CPUs & GPUs availability)
 - Display the available GPUs 
     - In simlab there is only one GPU per node
     - In Toubkal there are 4 GPUs per node
@@ -376,7 +376,7 @@ srun --partition=gpu --nodelist=node11 --pty bash
 ```shell
 node11 gpu:1 1/43/0/44 mix
 ```
-- Now I can run `srun --partition=gpu --gres=gpu:1 --pty bash` to allocate the gpu
+- Now I can run `srun --partition=gpu --nodelist=node11 --gres=gpu:1 --pty bash` to allocate the gpu in the `node11`
 - Run `sinfo -o "%n %G %C %t" | grep node11`
 ```shell
 node11 gpu:1 2/43/0/44 mix
