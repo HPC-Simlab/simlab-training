@@ -599,7 +599,7 @@ JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
 
 3. Qos
 
-| QOS              | Time Limit     | Max. allowed usage of resources per user     | Max. for all jobs |
+| QOS              | Time Limit     | Max. allowed usage of resources per user for all jobs     | Max. Minutes for all jobs |
 |-------------------|---------------|---------------|-----------|
 | intr              | 01:00:00      | node=3        | |
 | default-cpu       | 1-12:00:00    | cpu=3584      | |
