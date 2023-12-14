@@ -41,14 +41,14 @@ It copies your public key in the file `$HOME/.ssh/authorized_keys` on SIMLAB.
 
 ### Copy data to the remote host <a name="copytoremote"></a> 
 
-- Without synchronization ([scp](https://en.wikipedia.org/wiki/Secure_copy_protocol))
+- Without synchronization ([scp](https://en.wikipedia.org/wiki/Secure_copy_prot<filename>ocol))
 
 ```sh
-$  scp -r <filename>  <login>@simlab-cluster.um6p.ma:<remote_directory>
+$  scp -r   <login>@simlab-cluster.um6p.ma:<remote_directory>
 ```
 - With synchronization (rsync):
 ```sh
-$  rsync -avz <filename>  <login>@simlab-cluster.um6p.ma:<remote_directory>
+$  rsync -avz   <login>@simlab-cluster.um6p.ma:<remote_directory> <filename>
 ```
 
  ### Copy data from the remote host <a name="copytohost"></a> 
@@ -56,7 +56,7 @@ $  rsync -avz <filename>  <login>@simlab-cluster.um6p.ma:<remote_directory>
 - Without synchronization (scp):
 
 ```sh
-$  scp -r <remote_directory> <login>@simlab-cluster.um6p.ma:<path/to/filename>
+$  scp -r  <login>@simlab-cluster.um6p.ma:<path/to/filename> <remote_directory>
 ```
 
 - With synchronization (rsync):
