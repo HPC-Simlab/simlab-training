@@ -13,7 +13,7 @@
 
 - Core
 	- Slurm refers to cores as CPUs.
-	- there are 40/44 cores per node in Simlab, and 56 cores in Toubkal 
+	- there are 40/44 cores per node in Simlab, and 56/112/128 cores in Toubkal 
 	- up to 384GB memory per node in Simlab & up to 1.5TB for some nodes in Toubkal
 
 - Task
