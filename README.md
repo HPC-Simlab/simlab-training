@@ -1,1 +1,1 @@
-# simla-training
+# simlab-training
