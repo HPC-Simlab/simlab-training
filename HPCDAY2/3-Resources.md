@@ -19,6 +19,9 @@
 - Task
 	- a task can be considered a command such as blast, bwa, script.py
  	- default: 1 cpu per task
+ 
+<img src="data/tasks.png" alt="Task" >
+
 ## I. Reserve resources
 
 **!!In simlab, please add `--reservation=hpc_training` in all the reservations!!**
