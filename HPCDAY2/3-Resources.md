@@ -17,7 +17,8 @@
 	- up to 384GB memory per node in Simlab & up to 1.5TB for some nodes in Toubkal
 
 - Task
-  
+	- a task can be considered a command such as blast, bwa, script.py
+ 	- default: 1 cpu per task
 ## I. Reserve resources
 
 **!!In simlab, please add `--reservation=hpc_training` in all the reservations!!**
