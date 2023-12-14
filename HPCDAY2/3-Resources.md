@@ -20,6 +20,9 @@
   
 ## I. Reserve resources
 
+**!!In simlab, please add `--reservation=hpc_training` in all the reservations!!**
+
+
 ### 1. `srun` command
 - Obtain a terminal on a CPU or GPU compute node within which you can execute your code,
 - Directly execute your code on the CPUs or GPUs.
@@ -50,9 +53,9 @@ if __name__ == "__main__":
     host = get_host_info()
     print(f"Hostname: {host}")
 ```
-- Load Python module, then run this command
+- Load Python module if it's not loaded, then run this command
 ```shell
-module load Python/3.8.2-GCCcore-9.3.0 && srun --ntasks=1 python3 script.py
+srun --ntasks=1 python3 script.py
 ```
 - This command will allocate one task in the default partition (defq).
 - The resources will be deallocated once the task is finished
