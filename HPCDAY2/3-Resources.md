@@ -12,9 +12,9 @@
 	- compute node; A cluster can contain a few compute nodes or thousands of compute nodes. These are often referred to as just nodes since jobs are only scheduled on the compute nodes.
 
 - Core
-	- Slurm refers to cores as cpus.
+	- Slurm refers to cores as CPUs.
 	- there are 40/44 cores per node in Simlab, and 56 cores in Toubkal 
-	- up 384GB memory per node in Simlab & up to 1.5TB for some nodes in Toubkal
+	- up to 384GB memory per node in Simlab & up to 1.5TB for some nodes in Toubkal
 
 - Task
   
@@ -38,9 +38,9 @@ srun --ntasks=1 --pty bash
 
 ***run `python3 script.py`***
 
-**Example 2: Running python script**
+**Example 2: Running Python script**
 
-- Run the python file `script.py`
+- Run the Python file `script.py`
 ```python
 import socket
 
@@ -66,7 +66,7 @@ Hostname: node03
 ```
 
 ### 2. `salloc` command
-- This command will allow you to reserve CPU or GPU resources to run multiple execution.
+- This command will allow you to reserve CPU or GPU resources to run multiple executions.
 ```shell
 salloc --ntasks=1
 ```
@@ -129,7 +129,7 @@ Submitted batch job 5858478
 squeue -j 5858478
 ```
 ***This command can display nothing if the job is very fast.***
-***But you can check the job output, running this command:***
+***But you can check the job output, by running this command:***
 ```shell
 cat slurm-5858478.out
 ```
@@ -369,7 +369,7 @@ visu01 gpu:1 0/44/0/44 idle
 ```
 ***This command does not give exact information about the available GPUs***
 
-***When the state is mix for a node containing gpu, it does not mean that the gpu is not available***
+***When the state is mixed for a node containing gpu, it does not mean that the gpu is not available***
 
 **Example:**
 - Allocate 1 task in the gpu partition
