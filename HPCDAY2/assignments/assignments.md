@@ -93,3 +93,8 @@ Thu Dec 14 00:34:36 2023
 │   0  205220 C ikissa+   497MiB   0   0.0   0.3  0:42  python3 ex4.py                             │
 ╘══════════════════════════════════════════════════════════════════════════════════════════════════╛
 ```
+
+### Exercise 5:
+- Run Jupyter Notebook on simlab
+- Run the cells of `pandas-timeseries.ipynb`
+
