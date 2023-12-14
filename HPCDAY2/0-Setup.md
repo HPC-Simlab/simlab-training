@@ -12,7 +12,7 @@ git clone https://github.com/HPC-Simlab/simlab-training.git
 
 - Access to Simlab
 ```shell
-ssh -CY <login>@simlab-cluster.um6p
+ssh -CY <login>@simlab-cluster.um6p.ma
 ```
 
 - Access to Toubkal
